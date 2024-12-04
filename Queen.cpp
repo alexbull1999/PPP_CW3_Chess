@@ -29,7 +29,14 @@ void Queen::printPiece(ostream& os) {
 };
 
 bool Queen::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg) {
-	return Bishop::isValidMove(move_from, move_to, cg) ||
-		Rook::isValidMove(move_from, move_to, cg);
+		ChessGame* cg, bool& isPieceTaken) {
+	//there should never be conflicts here, as from the Queen's position
+	//a move that is valid for a Bishop would not be valid for a Rook
+	//and vice-versa. So we should never encounter a situation where the
+	//Bishop isValidMove returns true but with isPieceTaken as false
+	//short circuiting the Rook isValidMove that would have returned 
+	//true with isPieceTaken as true.... this situation cannot occur
+	//given the rules of Chess Piece movement
+	return Bishop::isValidMove(move_from, move_to, cg, isPieceTaken) ||
+		Rook::isValidMove(move_from, move_to, cg, isPieceTaken);
 }

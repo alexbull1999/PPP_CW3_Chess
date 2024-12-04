@@ -21,6 +21,14 @@ std::ostream& operator << (std::ostream&, Colour&);
 enum Name {PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING};
 std::ostream& operator << (std::ostream&, Name&);
 
+//declaring a further enum to indicate the outcome of a given submitted move
+//and assigning binary values to be able to do a bitwise or operation
+enum MoveOutcome {
+	NOT_VALID_MOVE = 0b00, //binary value of 0
+	VALID_NO_CAPTURE = 0b01, //binary value of 1
+	VALID_WITH_CAPTURE = 0b11, //binary value of 3
+};
+
 
 //Forward declaration of ChessPiece class, so it can be used in ChessGame class
 class ChessPiece;

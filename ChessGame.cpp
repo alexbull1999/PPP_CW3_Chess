@@ -156,63 +156,80 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		return;
 	}
 
-	else if (movedPiece->isValidMove(move_from, move_to, this)) {
-		// you can't play a move that puts yourself in check even if it follows
-		// piece placement rules
-		if (willBeInCheck(whoseTurn, move_from, move_to)) {
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
-				<< move_to << "!\n";
-			return;
+	//setting an isPieceTaken param, that isValidMove updates to true if
+	//a piece has been taken by a valid move
+	bool isPieceTaken = false; 
+	bool validMove = movedPiece->isValidMove(move_from, move_to, this, 
+			isPieceTaken); //this updates isPieceTaken to true or false
+
+	// you can't play a move that puts yourself in check even if it follows
+	// piece placement rules - we need to check this separately
+	if (validMove && willBeInCheck(whoseTurn, move_from, move_to)) {
+		cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
+			<< move_to << "!\n";
+		return;
+	}
+	
+	int validFlag = validMove ? 0b01 : 0b00;
+	int captureFlag = isPieceTaken ? 0b10 : 0b00;
+	//Now we can do a bitwise or and reassign the value to the 
+	//MoveOutcome enum
+	MoveOutcome outcome = static_cast<MoveOutcome>(validFlag | captureFlag);
+	
+	//Can't initialize a variable within the case block so need to do so here
+	ChessPiece* takenPiece = nullptr; 
+
+	switch(outcome) {
+		case NOT_VALID_MOVE:
+		{
+			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to " <<
+				move_to << "!\n";
+			return;			
 		}
-
-		//if the valid move captures another piece, we need to reflect this
-		else if(capturesPiece(move_from, move_to)) {
-			ChessPiece* takenPiece = getBoardPiece(move_to);
-
+		
+		case VALID_WITH_CAPTURE: 
+		{
+			takenPiece = getBoardPiece(move_to);
 			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
 				move_from << " to " << move_to << " taking " << takenPiece->pieceColour
 				<< "'s " << takenPiece->pieceName << "\n";
-
+			//delete the taken piece from the board
 			delete takenPiece;
 			takenPiece = nullptr;
 
 			// decrement the pieceCounter for the colour whose piece has been taken
 			movedPiece->pieceColour == Colour::BLACK ? whiteCount-- : blackCount--;
+			break;
 		}
-
-		//but not all valid moves need result in a piece being taken
-		else {
+		
+		case VALID_NO_CAPTURE:
+		{
 			cout << whoseTurn << "'s " <<  movedPiece->pieceName << " moves from " <<
 				move_from << " to " << move_to << endl;
 		}
-
-		// we can now move the piece to its new position, and assign its old
-		// position to a nullptr; and change whose turn it is
-		updateBoard(movedPiece, move_from, move_to);
-		whoseTurn = (whoseTurn == Colour::BLACK) ? Colour::WHITE : Colour::BLACK;
-
-		//Before returning, we need to check if the person whoseTurn is now next is
-		//now in check or in checkmate
-
-		//We check for check first, as you cannot be in checkmate without check
-		if (isInCheck(whoseTurn)) {
-			if (isInCheckOrStalemate(whoseTurn)) {
-				cout << whoseTurn << " is in checkmate\n";
-			}
-			else {
-				cout << whoseTurn << " is in check\n";
-			}
-		}
-		else if (isInCheckOrStalemate(whoseTurn)) {
-			cout << whoseTurn << " is in stalemate\n";
-		}
-
-		return;
 	}
-	// reaching this point in the flow of control means an invalid move was
-	// picked on a valid piece, by the person whose turn it is
-	cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to " <<
-		move_to << "!\n";
+
+	// we can now move the piece to its new position, and assign its old
+	// position to a nullptr; and change whose turn it is
+	updateBoard(movedPiece, move_from, move_to);
+	whoseTurn = (whoseTurn == Colour::BLACK) ? Colour::WHITE : Colour::BLACK;
+
+	//Before returning, we need to check if the person whoseTurn is now next is
+	//now in check or in checkmate
+
+	//We check for check first, as you cannot be in checkmate without check
+	if (isInCheck(whoseTurn)) {
+		if (isInCheckOrStalemate(whoseTurn)) {
+			cout << whoseTurn << " is in checkmate\n";
+		}
+		else {
+			cout << whoseTurn << " is in check\n";
+		}
+	}
+	else if (isInCheckOrStalemate(whoseTurn)) {
+		cout << whoseTurn << " is in stalemate\n";
+	}
+
 	return;
 }
 
@@ -425,7 +442,8 @@ bool ChessGame::isInCheck(Colour kingColour) {
 					char letterFile = file + 'A';
 					char letterRank = rank + '1';
 					char cpPosition[2] = {letterFile, letterRank};
-					if (cp->isValidMove(cpPosition, kingPosition, this)) {
+					bool isPieceTaken = false;
+					if (cp->isValidMove(cpPosition, kingPosition, this, isPieceTaken)) {
 						delete[] kingPosition; //Freeing heap allocated memory
 						return true;
 					}
@@ -502,7 +520,8 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 					for (char moveRank = '1'; moveRank < '9'; moveRank++) {
 						char move_to[2] = {moveFile, moveRank};
 						//check if the move would be valid by piece movement rules
-						if (friendlyPiece-> isValidMove(move_from, move_to, this)) {
+						bool isTakenPiece = false;
+						if (friendlyPiece-> isValidMove(move_from, move_to, this, isTakenPiece)) {
 							//check if the move results in the king free from check
 							if (!willBeInCheck(kingColour, move_from, move_to)) {
 								return false; //i.e. not in checkmate

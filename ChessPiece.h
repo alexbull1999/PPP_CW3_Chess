@@ -15,7 +15,7 @@ class ChessPiece {
 		
 		//pure virtual method for isValidMove for child classes to have to overwrite
 		virtual bool isValidMove(char const move_from[2], 
-				char const move_to[2], ChessGame* cg) = 0;
+				char const move_to[2], ChessGame* cg, bool& isPieceTaken) = 0;
 
 		//pure virtual method for cloning, to enable deep copies of a ChessGame
 		virtual ChessPiece* clone() const = 0;

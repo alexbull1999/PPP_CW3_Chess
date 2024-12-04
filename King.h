@@ -12,7 +12,7 @@ class King : public ChessPiece {
 
 		//isValidMove declaration for King
 		bool isValidMove(char const move_from[2], char const move_to[2],
-				ChessGame* cg) override;
+				ChessGame* cg, bool& isPieceTaken) override;
 		// printPiece function I used during testing + to output the piece - the
 		// printPiece function enables dynamic binding within the static ostream <<
 		// operator
@@ -20,16 +20,6 @@ class King : public ChessPiece {
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. through  dynamic binding)
 		~King() override;
-
-		/*
-		bool getCheckStatus();
-
-		void setCheckStatus(bool truefalse);
-
-	private:
-
-		bool isCheck;
-		*/
 
 };
 

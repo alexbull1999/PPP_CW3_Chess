@@ -27,12 +27,10 @@ void Pawn::printPiece(ostream& os) {
 
 //CHECK AFTER IF better to combine into fewer if statements for efficiency?
 bool Pawn::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg) {
+		ChessGame* cg, bool& isPieceTaken) {
 
-	//Logic for Black pawns to start with 
-	//Have been unable to use abs() to combine logic for both colours
-	//as pawns cannot move backwards
-
+	//isPieceTaken ref parameter starts by default as false from submitMove call
+	
 	//If a Pawn is not taking another piece it can only move straight forward
 	//by 1 space normally, or by 2 if from starting position
 	if(pieceColour == Colour::BLACK) {
@@ -58,6 +56,8 @@ bool Pawn::isValidMove(char const move_from[2], char const move_to[2],
 		//handle the possibility of a pawn moving diagonally to take a piece
 		if(abs(move_from[0] - move_to[0]) == 1 && move_from[1] - move_to[1] == 1) {
 			if(cg->capturesPiece(move_from, move_to)) {
+				//update isPieceTaken to indicate piece being taken
+				isPieceTaken = true;
 				return true;
 			}
 		}
@@ -84,6 +84,7 @@ bool Pawn::isValidMove(char const move_from[2], char const move_to[2],
 		//mirror logic for a white pawn taking a piece
 		if(abs(move_from[0] - move_to[0]) == 1 && move_to[1] - move_from[1] == 1) {
 			if(cg->capturesPiece(move_from, move_to)) {
+				isPieceTaken = true;
 				return true;
 			}
 		}

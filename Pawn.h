@@ -13,7 +13,7 @@ class Pawn : public ChessPiece {
 
 		//isValidMove declaration for Pawn
 		bool isValidMove(char const move_from[2], char const move_to[2], 
-				ChessGame* cg) override; //think if this last one should also be const somehow
+				ChessGame* cg, bool& isPieceTaken) override; 
 		
 		void printPiece(std::ostream&) override;
 		~Pawn() override;

@@ -27,7 +27,7 @@ void Bishop::printPiece(ostream& os) {
 };
 
 bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg) {
+		ChessGame* cg, bool& isPieceTaken) {
 	// bishops can only move diagonally, so a first way to check if a move is
 	// valid is to see if the number of squares moved vertically and horizontally
 	// are equal
@@ -56,6 +56,7 @@ bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		//if move_to is occupied, check its occupied by an opposing piece
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece being taken
 			return true;
 		}
 		return false;
@@ -76,6 +77,7 @@ bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// move_to occupied by an opposing piece
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece being taken
 			return true;
 		}
 		return false;
@@ -96,6 +98,7 @@ bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by opposing piece return true
 		else if(cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece being taken
 			return true;
 		}
 		return false;
@@ -116,6 +119,7 @@ bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //indicate piece being taken
 			return true;
 		}
 	}

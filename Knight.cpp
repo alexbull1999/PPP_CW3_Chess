@@ -27,7 +27,7 @@ void Knight::printPiece(ostream& os) {
 };
 
 bool Knight::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg) {
+		ChessGame* cg, bool& isPieceTaken) {
 	//check to make sure that either it is moving 2 squares horizontally and 1
 	//square vertically, or vice versa (no other combo is legal)
 	if (!(((abs(move_from[0] - move_to[0]) == 2) && (abs(move_from[1] - move_to[1]) == 1)) 
@@ -41,6 +41,7 @@ bool Knight::isValidMove(char const move_from[2], char const move_to[2],
 	}
 	// if move_to occupied by an opposing piece; valid move
 	else if (cg->capturesPiece(move_from, move_to)) {
+		isPieceTaken = true; //indicate a piece is taken
 		return true;
 	}
 	// else (e.g. if move_to occupied by your piece) invalid move

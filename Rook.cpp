@@ -26,7 +26,7 @@ void Rook::printPiece(ostream& os) {
 };
 
 bool Rook::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg) {
+		ChessGame* cg, bool& isPieceTaken) {
 	//check first if either the rank or the file of move_to is the same as move_from,
 	//but not both
 	if ((move_from[0] != move_to[0] && move_from[1] != move_to[1]) || 
@@ -47,6 +47,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece is taken
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -67,6 +68,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece is taken
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -87,6 +89,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece being taken
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -107,6 +110,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
+			isPieceTaken = true; //Indicate piece being taken
 			return true;
 		}
 		// if move_to occupied by your own piece return false

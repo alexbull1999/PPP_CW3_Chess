@@ -27,7 +27,7 @@ void King::printPiece(ostream& os) {
 };
 
 bool King::isValidMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg) {
+		ChessGame* cg, bool& isPieceTaken) {
 	//first check if the king is being moved only one square
 	if (!(
 				((abs(move_from[0] - move_to[0]) == 1) && 
@@ -43,6 +43,7 @@ bool King::isValidMove(char const move_from[2], char const move_to[2],
 	}
 	// if move_to occupied by an opposing piece; valid move
 	else if (cg->capturesPiece(move_from, move_to)) {
+		isPieceTaken = true; //Indicate piece being taken
 		return true;
 	}
 	// else (e.g. if move_to occupied by your piece) invalid move
@@ -50,12 +51,4 @@ bool King::isValidMove(char const move_from[2], char const move_to[2],
 }
 
 
-/*
-bool getCheckStatus() {
-	return isCheck;
-}
 
-void setCheckStatus(bool truefalse) {
-	isCheck = truefalse;
-}
-*/
