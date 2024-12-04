@@ -400,7 +400,7 @@ ChessPiece* ChessGame::getBoardPiece(char const boardPosition[2]) {
 
 
 //getKing "getter" function
-char* ChessGame::getKingPosition(Colour kingColour) {
+bool ChessGame::isInCheck(Colour kingColour) {
 	//we need to allocate the King's position to the heap
 	//so it doesn't get deleted as a local variable and can be
 	//passed onto the checkingCheck function
@@ -415,20 +415,22 @@ char* ChessGame::getKingPosition(Colour kingColour) {
 				if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
 					kingPosition[0] = file + 'A';
 					kingPosition[1] = rank + '1';
-					return kingPosition;
+					//once king position found, see if it is under attack
+					bool isCheck = squareUnderAttack(kingPosition);
+					delete[] kingPosition; //Free the heap allocated memory
+					return isCheck ? true : false;
 				}
 			}
 		}
 	}
 	// failsafe in case king is not found for whatever reason
-	kingPosition[0] = '\0';
-	kingPosition[1] = '\0';
-	return kingPosition;
+	delete[] kingPosition;
+	throw std::logic_error("Unreachable code reached in isInCheck function");
 }
 
-bool ChessGame::isInCheck(Colour kingColour) {
-	char* kingPosition = getKingPosition(kingColour);
-	int oppoPieceCount = (kingColour == Colour::BLACK) ? whiteCount : blackCount;
+bool ChessGame::squareUnderAttack(char const board_square[2]) {
+	Colour pieceColour = getBoardPiece(board_square)->pieceColour;
+	int oppoPieceCount = (pieceColour == Colour::BLACK) ? whiteCount : blackCount;
 	for (int rank = 0; rank < 8; rank++) {
 		for (int file = 0; file <8; file++) {
 
@@ -438,20 +440,18 @@ bool ChessGame::isInCheck(Colour kingColour) {
 			}
 			else {
 				ChessPiece* cp = boardState[rank][file];
-				if (cp->pieceColour != kingColour) {
+				if (cp->pieceColour != pieceColour) {
 					char letterFile = file + 'A';
 					char letterRank = rank + '1';
 					char cpPosition[2] = {letterFile, letterRank};
-					bool isPieceTaken = false;
-					if (cp->isValidMove(cpPosition, kingPosition, this, isPieceTaken)) {
-						delete[] kingPosition; //Freeing heap allocated memory
+					bool isPieceTaken = false; //passing as default but do not care about
+					if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
 						return true;
 					}
 					else {
 						oppoPieceCount--;
 						// use of oppoPieceCount helps avoid iterating through entire board
 						if (oppoPieceCount == 0) {
-							delete[] kingPosition; //Freeing heap allocated memory
 							return false;
 						}
 					}
@@ -459,10 +459,8 @@ bool ChessGame::isInCheck(Colour kingColour) {
 			}
 		}
 	}
-	//flow of control should never reach this far but adding a failsafe delete
-	//statement in case
-	delete[] kingPosition;
-	throw std::logic_error("Unreachable code reached in isInCheck function");
+	//flow of control should never reach this far but adding a failsafe 
+	throw std::logic_error("Unreachable code reached in squareUnderAttack function");
 }
 
 

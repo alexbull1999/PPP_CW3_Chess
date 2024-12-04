@@ -78,10 +78,11 @@ class ChessGame {
 		bool isValidPiece(char letter, int rank_counter, int file_counter);
 		
 		//helper function to find a square occupied by a King of a given colour
-		char* getKingPosition(Colour kingColour);
-
-		//helper function to determine if a King is currently in check
+		//and call square under Attack to determine if king is in check
 		bool isInCheck(Colour kingColour);
+
+		//helper function to determine if a square is currently under attack
+		bool squareUnderAttack(char const board_square[2]);
 
 		//helper function to determine if a move will take a King out of check or
 		//put a King in check
