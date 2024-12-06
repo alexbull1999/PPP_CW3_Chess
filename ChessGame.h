@@ -68,11 +68,16 @@ class ChessGame {
 		// taken
 		bool capturesPiece(char const move_from[2], char const move_to[2]);
 
+		int castlingOptions; //delete
+
+		friend class King;
+
 	private:
 		ChessPiece* boardState[8][8]; 
 		Colour whoseTurn;
 		int whiteCount;
 		int blackCount;
+		//int castlingOptions;
 
 		// helper function to ensure validity of FSN string
 		bool isValidPiece(char letter, int rank_counter, int file_counter);
@@ -82,7 +87,7 @@ class ChessGame {
 		bool isInCheck(Colour kingColour);
 
 		//helper function to determine if a square is currently under attack
-		bool squareUnderAttack(char const board_square[2]);
+		bool squareUnderAttack(char const board_square[2], Colour yourPieceColour);
 
 		//helper function to determine if a move will take a King out of check or
 		//put a King in check

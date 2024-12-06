@@ -17,13 +17,22 @@ class Rook : virtual public ChessPiece {
 		//isValidMove declaration for Rook
 		bool isValidMove(char const move_from[2], char const move_to[2], 
 				ChessGame* cg, bool& isPieceTaken) override;
+
+		//Helper function to update the castlingOptions attribute if the Rook has
+		//moved - signalling castling no longer available
+		void updateCastlingOptions(char const move_from[2], 
+				Colour rookColour, ChessGame* cg);
+
+
 		// printPiece function I used during testing + to output the piece - the
 		// printPiece function enables dynamic binding within the static ostream <<
 		// operator
 		void printPiece(std::ostream&) override;
+
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. through  dynamic binding)
 		~Rook() override;
+
 
 };
 

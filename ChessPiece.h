@@ -32,7 +32,12 @@ class ChessPiece {
 
 		//friend to allow ChessGame class to see piece colour and ensure it matches with
 		//whose turn it is to go
-		friend class ChessGame; 
+		friend class ChessGame;
+	
+		//required to allow the King to check for the Rook's existence, and colour
+		//when ensuring castling validity, as pieceColour and pieceName are protected
+		//otherwise
+		friend class King; 
 
 	protected:
 		Colour pieceColour;

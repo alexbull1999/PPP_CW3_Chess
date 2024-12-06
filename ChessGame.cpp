@@ -34,9 +34,12 @@ void ChessGame::loadState(char const board_string[MAX_FSN_LENGTH]) {
 		}
 	}
 	//reset whiteCount and blackCount to 0; in case they were previously
-	//initialised from a different board state
+	//initialised from a different board state. And castling options.
 	whiteCount = 0;
 	blackCount = 0;
+	//using 4 digit binary number to represent castling options
+	castlingOptions = 0b0000; 
+
 
 	// now create new board state, having deleted previous board
 	// We combine all counters into one loiop to maximise efficiency
@@ -88,11 +91,36 @@ void ChessGame::loadState(char const board_string[MAX_FSN_LENGTH]) {
 		cerr << "Invalid FSN notation inputted - cannot load game \n";
 		exit(1);
 	}
+	FSNCounter += 2; //skips over the space onto first castling characters
 
-	// Implement castling here and assign it to the King/Rook
+	// we know there is a max of 4 castling characters, and that as soon as
+	// we encounter a - or the sentinel value (end of string) we should stop
+	
+	for (int limit = FSNCounter + 4; FSNCounter <= limit; FSNCounter++ ) { //test edge cases
+		if (board_string[FSNCounter] == '-' || board_string[FSNCounter] == '\0') {
+			cout << "A new board state is loaded!\n";
+			return;
+		}
+		else if (board_string[FSNCounter] == 'K') {
+			//White can castle kingside, stored as bit 0 of castlingOptions
+			castlingOptions |= 0b0001; //using bitwise or
+		}
+		else if (board_string[FSNCounter] == 'Q') {
+			//White can castle queenside, stored as bit 1
+			castlingOptions |= 0b0010;
+		}
+		else if (board_string[FSNCounter] == 'k') {
+			//black can castle kingside, stored as bit 2
+			castlingOptions |= 0b0100;
+		}
+		else if (board_string[FSNCounter] == 'q') {
+			//black can castle queenside, stored as bit 3
+			castlingOptions |= 0b1000;
+		}
+	}
+	
 
-	cout << "A new board state is loaded!\n";
-	return;
+	throw logic_error("Unreachable code reached in load_state function");
 }
 
 //overloading ostream operator for colour enum
@@ -416,7 +444,7 @@ bool ChessGame::isInCheck(Colour kingColour) {
 					kingPosition[0] = file + 'A';
 					kingPosition[1] = rank + '1';
 					//once king position found, see if it is under attack
-					bool isCheck = squareUnderAttack(kingPosition);
+					bool isCheck = squareUnderAttack(kingPosition, kingColour);
 					delete[] kingPosition; //Free the heap allocated memory
 					return isCheck ? true : false;
 				}
@@ -425,12 +453,12 @@ bool ChessGame::isInCheck(Colour kingColour) {
 	}
 	// failsafe in case king is not found for whatever reason
 	delete[] kingPosition;
-	throw std::logic_error("Unreachable code reached in isInCheck function");
+	throw logic_error("Unreachable code reached in isInCheck function");
 }
 
-bool ChessGame::squareUnderAttack(char const board_square[2]) {
-	Colour pieceColour = getBoardPiece(board_square)->pieceColour;
-	int oppoPieceCount = (pieceColour == Colour::BLACK) ? whiteCount : blackCount;
+bool ChessGame::squareUnderAttack(char const board_square[2], 
+		Colour yourPieceColour) {
+	int oppoPieceCount = (yourPieceColour == Colour::BLACK) ? whiteCount : blackCount;
 	for (int rank = 0; rank < 8; rank++) {
 		for (int file = 0; file <8; file++) {
 
@@ -440,7 +468,7 @@ bool ChessGame::squareUnderAttack(char const board_square[2]) {
 			}
 			else {
 				ChessPiece* cp = boardState[rank][file];
-				if (cp->pieceColour != pieceColour) {
+				if (cp->pieceColour != yourPieceColour) {
 					char letterFile = file + 'A';
 					char letterRank = rank + '1';
 					char cpPosition[2] = {letterFile, letterRank};
@@ -460,7 +488,7 @@ bool ChessGame::squareUnderAttack(char const board_square[2]) {
 		}
 	}
 	//flow of control should never reach this far but adding a failsafe 
-	throw std::logic_error("Unreachable code reached in squareUnderAttack function");
+	throw logic_error("Unreachable code reached in squareUnderAttack function");
 }
 
 
@@ -539,7 +567,7 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 		}
 	}
 	//flow of control should never reach here
-	throw std::logic_error("Unreachable code reached in isInCheckmate function");
+	throw logic_error("Unreachable code reached in isInCheckmate function");
 }
 
 

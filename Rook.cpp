@@ -1,6 +1,7 @@
 #include "ChessPiece.h"
 #include "Rook.h"
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -43,11 +44,24 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to also empty return true
 		if(!cg->getBoardPiece(move_to)) {
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions. This will only affect rooks
+			//starting on A file, as we are checking increasing file direction
+			if ((pieceColour == Colour::BLACK && !strcmp(move_from, "A8")) ||
+					(pieceColour == Colour::WHITE && !strcmp(move_from, "A1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true; 
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
 			isPieceTaken = true; //Indicate piece is taken
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions
+			if ((pieceColour == Colour::BLACK && !strcmp(move_from, "A8")) ||
+					(pieceColour == Colour::WHITE && !strcmp(move_from, "A1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -64,11 +78,24 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to also empty return true
 		if(!cg->getBoardPiece(move_to)) {
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions - only applicable for rooks starting
+			//on H-file given the direction of travel we are checking
+			if ((pieceColour == Colour::BLACK && !strcmp(move_from, "H8")) ||
+					(pieceColour == Colour::WHITE && !strcmp(move_from, "H1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true; 
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
 			isPieceTaken = true; //Indicate piece is taken
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions
+			if ((pieceColour == Colour::BLACK && !strcmp(move_from, "H8")) ||
+					(pieceColour == Colour::WHITE && !strcmp(move_from, "H1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -85,11 +112,23 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to also empty return true
 		if(!cg->getBoardPiece(move_to)) {
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions - only affects white rooks here
+			if (pieceColour == Colour::WHITE && (!strcmp(move_from, "A1") ||
+					!strcmp(move_from, "H1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true; 
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
 			isPieceTaken = true; //Indicate piece being taken
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions - only affects white rooks here
+			if (pieceColour == Colour::WHITE && (!strcmp(move_from, "A1") ||
+					!strcmp(move_from, "H1"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -106,11 +145,23 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		// if move_to also empty return true
 		if(!cg->getBoardPiece(move_to)) {
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions - only affects black rooks here
+			if (pieceColour == Colour::BLACK && (!strcmp(move_from, "A8") ||
+					!strcmp(move_from, "H8"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true; 
 		}
 		// if move_to occupied by an opposing piece return true
 		else if (cg->capturesPiece(move_from, move_to)) {
 			isPieceTaken = true; //Indicate piece being taken
+			//if the rook is moving from its home square we need to
+			//updateCastlingOptions - only affects black rooks here
+			if (pieceColour == Colour::BLACK && (!strcmp(move_from, "A8") ||
+					!strcmp(move_from, "H8"))) {
+				updateCastlingOptions(move_from, pieceColour, cg);
+			}
 			return true;
 		}
 		// if move_to occupied by your own piece return false
@@ -118,6 +169,33 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 	}
 	return false;
 }
+
+void Rook::updateCastlingOptions(char const move_from[2],
+		Colour rookColour, ChessGame* cg) {
+	//we need to check both what colour the rook is, and what side of
+	//the king it is, to know which castlingOption to clear/disable
+	if (rookColour == Colour::BLACK) {
+		if (move_from[0] == 'A') {
+			//disable black queenside castlingOptions
+			cg->castlingOptions &= ~0b1000;
+		}
+		else if (move_from[0] == 'H') {
+			//disable black kingside castling
+			cg->castlingOptions &= ~0b0100;
+		}
+	}
+	else if (rookColour == Colour::WHITE) {
+		if (move_from[0] == 'A') {
+			//disable white queenside castling
+			cg->castlingOptions &= ~0b0010;
+		}
+		else if (move_from[0] == 'H') {
+			//disable white kingside castling
+			cg->castlingOptions &= ~0b0001;
+		}
+	}
+}
+
 
 
 
