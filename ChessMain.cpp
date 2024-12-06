@@ -76,5 +76,6 @@ int main() {
 	cg.submitMove("D3", "G6");
 	cout << '\n';
 
+
 	return 0;
 }

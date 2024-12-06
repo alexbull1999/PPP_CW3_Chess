@@ -37,16 +37,23 @@ bool King::isValidMove(char const move_from[2], char const move_to[2],
 
 	//then check if the king is being moved only one square, as if the king
 	//is not castling and not moving only one square the moved is defacto invalid
+	//The below logic ensures we are also checking that the king is not moving 0
+	//squares which would be invalid
 	if (!(
 				((abs(move_from[0] - move_to[0]) == 1) && 
 				(abs(move_from[1] - move_to[1]) < 2)) || 
 				((abs(move_from[1] - move_to[1]) == 1) &&
 				 (abs(move_from[0] - move_to[0]) < 2))
 				)) {
+		//update isPieceTaken before returning false; as even if there was
+		//an opponent piece in the move_to square, it won't be taken due to
+		//invalid move (again making sure the bitwise enum works in submitMove)
+		isPieceTaken = false;
 		return false;
 	}
-	// if move_to is empty; valid move
-	else if(!cg->getBoardPiece(move_to)) {
+	// else its a valid move, so we can update castling options, and return
+	// true
+	else {
 		//we only need to updateCastlingOptions once, if the King is moving from
 		//its home square
 		if ((pieceColour == Colour::BLACK && !strcmp(move_from, "E8")) ||
@@ -55,19 +62,6 @@ bool King::isValidMove(char const move_from[2], char const move_to[2],
 		}
 		return true; 
 	}
-	// if move_to occupied by an opposing piece; valid move
-	else if (cg->capturesPiece(move_from, move_to)) {
-		isPieceTaken = true; //Indicate piece being taken
-		//we only need to updateCastlingOptions once, if the King is moving from
-		//its home square
-		if ((pieceColour == Colour::BLACK && !strcmp(move_from, "E8")) ||
-				(pieceColour == Colour::WHITE && !strcmp(move_from, "E1"))) {
-			updateCastlingOptions(pieceColour, cg);
-		}							 
-		return true;
-	}
-	// else (e.g. if move_to occupied by your piece) invalid move
-	return false;
 }
 
 
@@ -91,8 +85,10 @@ void King::updateCastlingOptions(Colour kingColour, ChessGame* cg) {
 
 //note we do not need to pass bool &isPieceTaken into this function, 
 //because you are not allowed to take a piece when castling, and 
-//isPieceTaken is by default set to false, so never will need updating
-//through castling
+//isPieceTaken will by logic have been set to false, if this method returns true.
+//Because this method checks that the squares the king is castling through are 
+//empty
+
 bool King::checkForCastlingMove(char const move_from[2], char const move_to[2], 
 		ChessGame* cg) {
 	//check if move is exactly 2 spaces long first moving only in file direction
@@ -113,14 +109,21 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
-		// Now we need to check the King is not in check and that none of 
-		// the squares the king will pass through will be under attack
-		for (char file = 'E', rank = '8'; file < 'H'; file++) {
+		//Now we need to check that the King is not in check
+		if (cg->squareUnderAttack("E8", Colour::BLACK)) {
+			return false;
+		}
+		// Now we need to check that none of 
+		// the squares the king will pass through will be under attack. We
+		// can simultaneously check that the squares are also empty
+		for (char file = 'F', rank = '8'; file < 'H'; file++) {
 			char board_square[2] = {file, rank};
-			if (cg->squareUnderAttack(board_square, Colour::BLACK)) {
+			if (cg->squareUnderAttack(board_square, Colour::BLACK) ||
+					cg->getBoardPiece(board_square)) {
 				return false;
 			}
 		}
+
 		//If none of the above has returned false, then castling conditions
 		//are satisfied and we can update the Rook's position here, and return
 		//true, where the King's position will be updated in submitMove
@@ -142,11 +145,16 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
-		// Now we need to check the King is not in check and that none of 
+		// Now we need to check the King is not in check
+		if (cg->squareUnderAttack("E8", Colour::BLACK)) {
+			return false;
+		}
+		// Now check that none  
 		// the squares the king will pass through will be under attack
-		for (char file = 'E', rank = '8'; file > 'B'; file--) {
+		for (char file = 'D', rank = '8'; file > 'B'; file--) {
 			char board_square[2] = {file, rank};
-			if (cg->squareUnderAttack(board_square, Colour::BLACK)) {
+			if (cg->squareUnderAttack(board_square, Colour::BLACK) ||
+					cg->getBoardPiece(board_square)) {
 				return false;
 			}
 		}
@@ -171,11 +179,16 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::WHITE)) {
 			return false;
 		}
-		// Now we need to check the King is not in check and that none of 
+		// Now we need to check the King is not in check
+		if (cg->squareUnderAttack("E1", Colour::WHITE)) {
+			return false;
+		}
+		// Also check that none of 
 		// the squares the king will pass through will be under attack
-		for (char file = 'E', rank = '1'; file < 'H'; file++) {
+		for (char file = 'F', rank = '1'; file < 'H'; file++) {
 			char board_square[2] = {file, rank};
-			if (cg->squareUnderAttack(board_square, Colour::WHITE)) {
+			if (cg->squareUnderAttack(board_square, Colour::WHITE) ||
+					cg->getBoardPiece(board_square)) {
 				return false;
 			}
 		}
@@ -200,11 +213,16 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::WHITE)) {
 			return false;
 		}
-		// Now we need to check the King is not in check and that none of 
+		// Now we need to check the King is not in check 
+		if (cg->squareUnderAttack("E1", Colour::WHITE)) {
+			return false;
+		}
+		// Also check that none of 
 		// the squares the king will pass through will be under attack
-		for (char file = 'E', rank = '1'; file > 'B'; file--) {
+		for (char file = 'D', rank = '1'; file > 'B'; file--) {
 			char board_square[2] = {file, rank};
-			if (cg->squareUnderAttack(board_square, Colour::WHITE)) {
+			if (cg->squareUnderAttack(board_square, Colour::WHITE) ||
+					cg->getBoardPiece(board_square)) {
 				return false;
 			}
 		}
@@ -220,3 +238,5 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 	//castling conditions not fulfilled
 	return false;
 }
+
+

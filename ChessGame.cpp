@@ -48,13 +48,14 @@ void ChessGame::loadState(char const board_string[MAX_FSN_LENGTH]) {
 	// NOTE: ADD SOME TRY/CATCH EXCEPTION HANDLING
 	int FSNCounter = 0;
 	for (int rank_counter = 7, file_counter = 0; board_string[FSNCounter] != ' ';
-			file_counter++, FSNCounter++) {
+			FSNCounter++) {
 		
 		if (rank_counter < 0) {
 			cerr << "Warning - error; rank_counter has gone below 0";
 		}
 
 		if (isValidPiece(board_string[FSNCounter], rank_counter, file_counter)) {
+			file_counter++;
 			continue;
 		}
 
@@ -68,7 +69,7 @@ void ChessGame::loadState(char const board_string[MAX_FSN_LENGTH]) {
 		}
 
 		else if (board_string[FSNCounter] == '/') {
-			file_counter = -1;
+			file_counter = 0;
 			rank_counter--;
 		}
 
@@ -183,16 +184,34 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		cout << "It is not " << movedPiece->pieceColour << "'s turn to move!\n";
 		return;
 	}
+	
+	//setting an isPieceTaken parameter, that is updated to true if there is an
+	//enemy piece in the move_to square. this is passed as a reference param to
+	//isValidMove, and if the move is invalid, then this is changed back to false
+	//so that the enum MoveOutcome and bitwise or operation still works
+	bool isPieceTaken = false;
 
-	//setting an isPieceTaken param, that isValidMove updates to true if
-	//a piece has been taken by a valid move
-	bool isPieceTaken = false; 
+	//We can also check at this point already if the move_to square is already
+	//occupied by a piece of the same colour, as the piece trying to move - as
+	//this is always invalid, we can avoid bothering to check the more complicated
+	//piece move logic in isValidMove
+	ChessPiece* takenPiece = getBoardPiece(move_to);
+	if (takenPiece != nullptr) { //check first to not derefence nullptr
+		if (movedPiece->pieceColour == takenPiece->pieceColour) {
+			cout << whoseTurn << "'s" << movedPiece->pieceName << " cannot move to "
+				<< move_to << "!\n";
+		}
+		else {
+			isPieceTaken = true;
+		}
+	}
+
 	bool validMove = movedPiece->isValidMove(move_from, move_to, this, 
 			isPieceTaken); //this updates isPieceTaken to true or false
 
 	// you can't play a move that puts yourself in check even if it follows
 	// piece placement rules - we need to check this separately
-	if (validMove && willBeInCheck(whoseTurn, move_from, move_to)) {
+	if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
 		cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
 			<< move_to << "!\n";
 		return;
@@ -204,9 +223,6 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	//MoveOutcome enum
 	MoveOutcome outcome = static_cast<MoveOutcome>(validFlag | captureFlag);
 	
-	//Can't initialize a variable within the case block so need to do so here
-	ChessPiece* takenPiece = nullptr; 
-
 	switch(outcome) {
 		case NOT_VALID_MOVE:
 		{
@@ -217,7 +233,6 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		
 		case VALID_WITH_CAPTURE: 
 		{
-			takenPiece = getBoardPiece(move_to);
 			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
 				move_from << " to " << move_to << " taking " << takenPiece->pieceColour
 				<< "'s " << takenPiece->pieceName << "\n";
@@ -472,7 +487,9 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 					char letterFile = file + 'A';
 					char letterRank = rank + '1';
 					char cpPosition[2] = {letterFile, letterRank};
-					bool isPieceTaken = false; //passing as default but do not care about
+					//by default isPieceTaken is true, here as we are checking if the
+					//square is under attack from an enemy piece.
+					bool isPieceTaken = true;
 					if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
 						return true;
 					}
@@ -495,7 +512,7 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 // Testing if a proposed move that is valid by the rules of Chess takes a King
 // out of Check
 bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2], 
-		 char const move_to[2]) {
+		 char const move_to[2], bool isPieceTaken) {
 	// Create a deep copy of the current board
 	ChessGame copiedGame(*this);
 
@@ -504,11 +521,13 @@ bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2],
 	//Commit the proposed move to the copied board
 	//Dealing with possibility of capturing a piece or moving to an 
 	//empty square
-	if (copiedGame.capturesPiece(move_from, move_to)) {	
+	if (isPieceTaken) {	
 		ChessPiece* takenPiece = copiedGame.getBoardPiece(move_to);
-		delete takenPiece;
-		takenPiece = nullptr;
-		movedPiece->pieceColour == Colour::BLACK ? copiedGame.whiteCount-- : copiedGame.blackCount--;
+		if (takenPiece != nullptr) {
+			delete takenPiece;
+			takenPiece = nullptr;
+		}
+		movedPiece->pieceColour == Colour::BLACK ? copiedGame.whiteCount-- : copiedGame.blackCount--;		
 	}
 
 	// Move the piece being moved to the new position on the copied
@@ -545,11 +564,23 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 				for (char moveFile = 'A'; moveFile < 'I'; moveFile++) {
 					for (char moveRank = '1'; moveRank < '9'; moveRank++) {
 						char move_to[2] = {moveFile, moveRank};
+
 						//check if the move would be valid by piece movement rules
-						bool isTakenPiece = false;
-						if (friendlyPiece-> isValidMove(move_from, move_to, this, isTakenPiece)) {
-							//check if the move results in the king free from check
-							if (!willBeInCheck(kingColour, move_from, move_to)) {
+						//Copying the logic of submitMove, checking first for if a piece
+						//will be taken				
+						bool isPieceTaken = false;
+						ChessPiece* takenPiece = getBoardPiece(move_to);
+						if (takenPiece != nullptr) { //check first to not derefence nullptr
+							if (kingColour == takenPiece->pieceColour) {
+								continue; //invalid move as you can't move to a square of own colour
+							}
+							else {
+								isPieceTaken = true;
+							}
+						}
+						if (friendlyPiece-> isValidMove(move_from, move_to, this, isPieceTaken)) {
+							//if valid, check if the move results in the king free from check
+							if (!willBeInCheck(kingColour, move_from, move_to, isPieceTaken)) {
 								return false; //i.e. not in checkmate
 							}
 						}

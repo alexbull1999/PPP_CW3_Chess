@@ -65,11 +65,13 @@ class ChessGame {
 
 
 		// helper function to determine if a submitted move leads to a piece being
-		// taken
+		// taken (I originally used this function lots, but have since found a more
+		// efficient way to determine if a piece is being captured; via a reference
+		// parameter. I now only need this function in an edge case where a Queen
+		// is acting as a Rook and is capturing a piece)
 		bool capturesPiece(char const move_from[2], char const move_to[2]);
-
-		int castlingOptions; //delete
-
+		
+		//required for King to be able to view the castlingOptions private attribute
 		friend class King;
 
 	private:
@@ -77,7 +79,7 @@ class ChessGame {
 		Colour whoseTurn;
 		int whiteCount;
 		int blackCount;
-		//int castlingOptions;
+		int castlingOptions;
 
 		// helper function to ensure validity of FSN string
 		bool isValidPiece(char letter, int rank_counter, int file_counter);
@@ -92,7 +94,7 @@ class ChessGame {
 		//helper function to determine if a move will take a King out of check or
 		//put a King in check
 		bool willBeInCheck(Colour kingColour, char const move_from[2], 
-				char const move_to[2]);
+				char const move_to[2], bool isPieceTaken);
 
 		//helper function to determine if a King is in checkmate or stalemate
 		bool isInCheckOrStalemate(Colour kingColour);	

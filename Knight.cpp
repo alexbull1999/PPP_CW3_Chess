@@ -33,19 +33,16 @@ bool Knight::isValidMove(char const move_from[2], char const move_to[2],
 	if (!(((abs(move_from[0] - move_to[0]) == 2) && (abs(move_from[1] - move_to[1]) == 1)) 
 				|| ((abs(move_from[0] - move_to[0]) == 1) && (abs(move_from[1] - move_to[1]) == 2)))
 				) {
+		//update the isPieceTaken bool, to indicate false - as even if there was an
+		//enemy piece in the move_to square, this is an invalid move so no piece
+		//can be taken
+		isPieceTaken = false;
 		return false;
 	}
-	// if move_to is empty; valid move
-	else if(!cg->getBoardPiece(move_to)) {
+	// else we can return true, and let the isPieceTaken marker that has been
+	// precomputed take care of whether the move_to square is empty or not
+	else {
 		return true; 
 	}
-	// if move_to occupied by an opposing piece; valid move
-	else if (cg->capturesPiece(move_from, move_to)) {
-		isPieceTaken = true; //indicate a piece is taken
-		return true;
-	}
-	// else (e.g. if move_to occupied by your piece) invalid move
-	return false;
 }
-
 

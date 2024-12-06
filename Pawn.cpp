@@ -1,6 +1,7 @@
 #include "ChessPiece.h"
 #include "Pawn.h"
 #include <iostream>
+#include <cstdlib> //for abs function
 
 using namespace std;
 
@@ -29,66 +30,62 @@ void Pawn::printPiece(ostream& os) {
 bool Pawn::isValidMove(char const move_from[2], char const move_to[2], 
 		ChessGame* cg, bool& isPieceTaken) {
 
-	//isPieceTaken ref parameter starts by default as false from submitMove call
-	
-	//If a Pawn is not taking another piece it can only move straight forward
-	//by 1 space normally, or by 2 if from starting position
-	if(pieceColour == Colour::BLACK) {
-		//check staying in same file
-		if(move_from[0] == move_to[0]) {
-			//moving one space forward is valid, if that space is empty
-			if(move_from[1] - move_to[1] == 1) {
-				//if the space is empty, getBoardPiece returns a nullptr which evaluates to false
-				if(!cg->getBoardPiece(move_to)) {
-					return true;
-				}
-			}
-			//moving two spaces forward is valid, if both empty and from start 
-			else if(move_from[1] == '7' && move_from[1] - move_to[1] == 2) {
-				char  move_past[2];
-				move_past[0] = move_to[0];
-				move_past[1] = move_to[1] + 1;
-				if(!cg->getBoardPiece(move_past) && !cg->getBoardPiece(move_to)) {
-					return true;
-				}
-			}			
-		}
-		//handle the possibility of a pawn moving diagonally to take a piece
-		if(abs(move_from[0] - move_to[0]) == 1 && move_from[1] - move_to[1] == 1) {
-			if(cg->capturesPiece(move_from, move_to)) {
-				//update isPieceTaken to indicate piece being taken
-				isPieceTaken = true;
-				return true;
-			}
-		}
-		return false;
-	}
+	//Black pawns can only move down the board (rank wise), white pawns only
+	//up the board. We al
+	int pawnDirection = (pieceColour == Colour::BLACK) ? -1 : 1;
 
-	if(pieceColour == Colour::WHITE) {
-		//mirror logic for black but switching move_to and move_from
-		if(move_from[0] == move_to[0]) {
-			if(move_to[1] - move_from[1] == 1) {
-				if(!cg->getBoardPiece(move_to)) {
-					return true;
-				}
-			}
-			else if(move_from[1] == '2' && move_to[1] - move_from[1] == 2) {
-				char move_past[2];
-				move_past[0] = move_to[0];
-				move_past[1] = move_to[1] - 1;
-				if(!cg->getBoardPiece(move_past) && !cg->getBoardPiece(move_to)) {
-					return true;
-				}
-			}
+	//We can first use the isPieceTaken parameter to handle Pawn captures
+	//If isPieceTaken is set to true from submitMove, we know there should be
+	//a capture move we need to check the validity of
+	if (isPieceTaken) {
+		//ensure the pawn is moving diagonally by only one square, and in the right direction
+		if(abs(move_from[0] - move_to[0]) == 1 && (move_to[1] - move_from[1]) == pawnDirection) {
+			return true; //valid diagonal capture
 		}
-		//mirror logic for a white pawn taking a piece
-		if(abs(move_from[0] - move_to[0]) == 1 && move_to[1] - move_from[1] == 1) {
-			if(cg->capturesPiece(move_from, move_to)) {
-				isPieceTaken = true;
+		else {
+			//update isPieceTaken to be false, as it is an invalid diagonal capture 
+			//and an invalid move
+			isPieceTaken = false;
+			return false;
+		}
+	}
+	//now handle the cases where the pawn is not taking a piece, and hence they
+	//can only move vertically
+	else {
+		if (move_from[0] != move_to[0]) {
+			return false; //as they are not moving only vertically
+		}
+
+		//handle single square forward move
+		//we do not need to check if the move_to square is empty, as if it had not
+		//been empty, isPieceTaken would be set to true, and we would not have gone
+		//down this code branch...
+		if (move_to[1] - move_from[1] == pawnDirection) {
+			return true;
+		}
+
+		//handle two square forward move from starting position
+		char startingRank = (pieceColour == Colour::BLACK) ? '7' : '2';
+		if (((move_to[1] - move_from[1]) == (pawnDirection * 2)) && 
+				move_from[1] == startingRank) {
+			//we don't need to check the move_to square (as handled by isPieceTaken)
+			//but we do need to check the middle square the Pawn moves through
+			char move_through_file = move_from[0];
+			char move_through_rank = move_from[1] + pawnDirection;
+			char move_through[2] = {move_through_file, move_through_rank};
+			if(cg->getBoardPiece(move_through)) {
+				return false; //cannot move through a board piece 
+			}
+			else {
 				return true;
 			}
 		}
 	}
+	//the above if/else branches cover all possible pawn options, so reaching this
+	//code means an invalid pawn move
 	return false;
 }
+
+
+
 
