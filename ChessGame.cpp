@@ -13,117 +13,6 @@
 
 using namespace std;
 
-// Set default ChessGame constructor to initialize boardState array to nullptrs
-ChessGame::ChessGame() : boardState(), whiteCount(0), blackCount(0) {};
-
-//loadState function
-
-void ChessGame::loadState(char const board_string[MAX_FSN_LENGTH]) {
-	// clean the ChessGame board so any preexisting memory is deleted and
-	// assigned to nullptrs (important as we are calling loadState
-	// several times on the same ChessGame object) 
-	for (int rank_counter = 0; rank_counter < 8; rank_counter++) {
-		for (int file_counter = 0; file_counter < 8; file_counter++) {
-			if (boardState[rank_counter][file_counter] == nullptr) {
-				continue;
-			}
-			else {
-				delete boardState[rank_counter][file_counter];
-				boardState[rank_counter][file_counter] = nullptr;
-			}
-		}
-	}
-	//reset whiteCount and blackCount to 0; in case they were previously
-	//initialised from a different board state. And castling options.
-	whiteCount = 0;
-	blackCount = 0;
-	//using 4 digit binary number to represent castling options
-	castlingOptions = 0b0000; 
-
-
-	// now create new board state, having deleted previous board
-	// We combine all counters into one loiop to maximise efficiency
-	// We use a helper function isValidPiece to defensively check the validity
-	// of the FSN notation provided to us
-	// NOTE: ADD SOME TRY/CATCH EXCEPTION HANDLING
-	int FSNCounter = 0;
-	for (int rank_counter = 7, file_counter = 0; board_string[FSNCounter] != ' ';
-			FSNCounter++) {
-		
-		if (rank_counter < 0) {
-			cerr << "Warning - error; rank_counter has gone below 0";
-		}
-
-		if (isValidPiece(board_string[FSNCounter], rank_counter, file_counter)) {
-			file_counter++;
-			continue;
-		}
-
-		else if (board_string[FSNCounter] >= '1' && 
-				board_string[FSNCounter] <= '8') {
-			for (int emptyCount = '0'; emptyCount < board_string[FSNCounter]; 
-					emptyCount++) {
-				boardState[rank_counter][file_counter] = nullptr;
-				file_counter++;
-			}
-		}
-
-		else if (board_string[FSNCounter] == '/') {
-			file_counter = 0;
-			rank_counter--;
-		}
-
-		else {
-			cerr << "Invalid FSN notation inputted - cannot load game\n";
-			exit(1);
-		}
-	}
-	//at this point FSNCounter has now hit the first space in the FSN string
-	//so we can determine whose move it is. Doing it this way allows us to load 
-	//chess states halfway through games, where black has the 'first' turn
-	FSNCounter++;
-	if (board_string[FSNCounter] == 'w') {
-		whoseTurn = Colour::WHITE;
-	}
-	else if (board_string[FSNCounter] == 'b') {
-		whoseTurn = Colour::BLACK;
-	}
-	else {
-		cerr << "Invalid FSN notation inputted - cannot load game \n";
-		exit(1);
-	}
-	FSNCounter += 2; //skips over the space onto first castling characters
-
-	// we know there is a max of 4 castling characters, and that as soon as
-	// we encounter a - or the sentinel value (end of string) we should stop
-	
-	for (int limit = FSNCounter + 4; FSNCounter <= limit; FSNCounter++ ) { //test edge cases
-		if (board_string[FSNCounter] == '-' || board_string[FSNCounter] == '\0') {
-			cout << "A new board state is loaded!\n";
-			return;
-		}
-		else if (board_string[FSNCounter] == 'K') {
-			//White can castle kingside, stored as bit 0 of castlingOptions
-			castlingOptions |= 0b0001; //using bitwise or
-		}
-		else if (board_string[FSNCounter] == 'Q') {
-			//White can castle queenside, stored as bit 1
-			castlingOptions |= 0b0010;
-		}
-		else if (board_string[FSNCounter] == 'k') {
-			//black can castle kingside, stored as bit 2
-			castlingOptions |= 0b0100;
-		}
-		else if (board_string[FSNCounter] == 'q') {
-			//black can castle queenside, stored as bit 3
-			castlingOptions |= 0b1000;
-		}
-	}
-	
-
-	throw logic_error("Unreachable code reached in load_state function");
-}
-
 //overloading ostream operator for colour enum
 ostream& operator << (ostream& os, Colour& colour) {
 	switch(colour)
@@ -164,139 +53,123 @@ ostream& operator << (ostream& os, Name& name) {
 	return os;
 }
 
+/* Default ChessGame constructor (initializes boardState array to nullptrs).
+All other attributes initialized, but most are meaningfully assigned in
+loadState function */
+ChessGame::ChessGame() : boardState(), whoseTurn(Colour::WHITE), whiteCount(0), 
+	blackCount(0), castlingOptions(0b0000), gameOver(false), boardLoaded(false) {};
 
 
-void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
-	// check the move coordinates are valid to start with
-	if (move_from[0] > 'H' || move_from[0] < 'A' || move_from[1] > '8' || 
-			move_from[1] < '1' || move_to[0] > 'H' || move_to[0] < 'A' || move_to[1]
-			> '8' || move_to[1] < '1') {
-		cout << "Invalid board coordinates submitted\n";
-		return;
-	}
+void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 	
-	ChessPiece* movedPiece = getBoardPiece(move_from);
-	if (movedPiece == nullptr) {
-		cout << "There is no piece at position " << move_from << "!\n";
-		return;
-	}
-	else if(movedPiece->pieceColour != whoseTurn) {
-		cout << "It is not " << movedPiece->pieceColour << "'s turn to move!\n";
-		return;
-	}
-	
-	//setting an isPieceTaken parameter, that is updated to true if there is an
-	//enemy piece in the move_to square. this is passed as a reference param to
-	//isValidMove, and if the move is invalid, then this is changed back to false
-	//so that the enum MoveOutcome and bitwise or operation still works
-	bool isPieceTaken = false;
-
-	//We can also check at this point already if the move_to square is already
-	//occupied by a piece of the same colour, as the piece trying to move - as
-	//this is always invalid, we can avoid bothering to check the more complicated
-	//piece move logic in isValidMove
-	ChessPiece* takenPiece = getBoardPiece(move_to);
-	if (takenPiece != nullptr) { //check first to not derefence nullptr
-		if (movedPiece->pieceColour == takenPiece->pieceColour) {
-			cout << whoseTurn << "'s" << movedPiece->pieceName << " cannot move to "
-				<< move_to << "!\n";
-		}
-		else {
-			isPieceTaken = true;
-		}
-	}
-
-	bool validMove = movedPiece->isValidMove(move_from, move_to, this, 
-			isPieceTaken); //this updates isPieceTaken to true or false
-
-	// you can't play a move that puts yourself in check even if it follows
-	// piece placement rules - we need to check this separately
-	if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
-		cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
-			<< move_to << "!\n";
-		return;
-	}
-	
-	int validFlag = validMove ? 0b01 : 0b00;
-	int captureFlag = isPieceTaken ? 0b10 : 0b00;
-	//Now we can do a bitwise or and reassign the value to the 
-	//MoveOutcome enum
-	MoveOutcome outcome = static_cast<MoveOutcome>(validFlag | captureFlag);
-	
-	switch(outcome) {
-		case NOT_VALID_MOVE:
-		{
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to " <<
-				move_to << "!\n";
-			return;			
-		}
-		
-		case VALID_WITH_CAPTURE: 
-		{
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
-				move_from << " to " << move_to << " taking " << takenPiece->pieceColour
-				<< "'s " << takenPiece->pieceName << "\n";
-			//delete the taken piece from the board
-			delete takenPiece;
-			takenPiece = nullptr;
-
-			// decrement the pieceCounter for the colour whose piece has been taken
-			movedPiece->pieceColour == Colour::BLACK ? whiteCount-- : blackCount--;
-			break;
-		}
-		
-		case VALID_NO_CAPTURE:
-		{
-			cout << whoseTurn << "'s " <<  movedPiece->pieceName << " moves from " <<
-				move_from << " to " << move_to << endl;
-		}
-	}
-
-	// we can now move the piece to its new position, and assign its old
-	// position to a nullptr; and change whose turn it is
-	updateBoard(movedPiece, move_from, move_to);
-	whoseTurn = (whoseTurn == Colour::BLACK) ? Colour::WHITE : Colour::BLACK;
-
-	//Before returning, we need to check if the person whoseTurn is now next is
-	//now in check or in checkmate
-
-	//We check for check first, as you cannot be in checkmate without check
-	if (isInCheck(whoseTurn)) {
-		if (isInCheckOrStalemate(whoseTurn)) {
-			cout << whoseTurn << " is in checkmate\n";
-		}
-		else {
-			cout << whoseTurn << " is in check\n";
-		}
-	}
-	else if (isInCheckOrStalemate(whoseTurn)) {
-		cout << whoseTurn << " is in stalemate\n";
-	}
-
-	return;
-}
-
-
-/* A function I used during coding to check the loadState function was working
- * as expected */
-void ChessGame::displayBoard() {
-	for (int rank_counter = 7; rank_counter >= 0; rank_counter--) {
+	// first clean the ChessGame board in case there was a previous game
+	for (int rank_counter = 0; rank_counter < 8; rank_counter++) {
 		for (int file_counter = 0; file_counter < 8; file_counter++) {
-			if (file_counter != 7) {
-				cout << boardState[rank_counter][file_counter];
+			if (boardState[rank_counter][file_counter] == nullptr) {
+				continue;
 			}
-			else if (file_counter == 7) {
-				cout << boardState[rank_counter][file_counter] << "\n";
+			else {
+				delete boardState[rank_counter][file_counter];
+				boardState[rank_counter][file_counter] = nullptr;
 			}
 		}
 	}
+
+	//reset whiteCount, blackCount, and castlingOptions attributes in case
+	//they were changed in a previous game
+	whiteCount = 0;
+	blackCount = 0;
+	castlingOptions = 0b0000; 
+
+	// now we can create a new board state, using a helper function isValidPiece
+	// to defensively check the validity of the FEN string provided to us
+	int FENCounter = 0;
+	for (int rank_counter = 7, file_counter = 0; board_string[FENCounter] != ' ';
+			FENCounter++) {
+		
+		if (rank_counter < 0) {
+			cerr << "Warning - error; rank_counter has gone below 0";
+		}
+
+		if (isValidPiece(board_string[FENCounter], rank_counter, file_counter)) {
+			file_counter++;
+			continue;
+		}
+
+		else if (board_string[FENCounter] >= '1' && 
+				board_string[FENCounter] <= '8') {
+			for (int emptyCount = '0'; emptyCount < board_string[FENCounter]; 
+					emptyCount++) {
+				boardState[rank_counter][file_counter] = nullptr;
+				file_counter++;
+			}
+		}
+
+		else if (board_string[FENCounter] == '/') {
+			file_counter = 0;
+			rank_counter--;
+		}
+
+		else {
+			cout << "Invalid FEN notation inputted - cannot load game\n";
+			return;
+		}
+	}
+
+	//once the above for loop is complete, the FENCounter has hit the first space
+	//in the FEN string so we can next determine whose move it is.
+	FENCounter++;
+
+	if (board_string[FENCounter] == 'w') {
+		whoseTurn = Colour::WHITE;
+	}
+	else if (board_string[FENCounter] == 'b') {
+		whoseTurn = Colour::BLACK;
+	}
+	else {
+		cout << "Invalid FEN notation inputted - cannot load game \n";
+		return;
+	}
+
+	FENCounter += 2; //skips over the space onto first castling characters
+
+	// we know there is a max of 4 castling characters, and that as soon as
+	// we encounter a - or the sentinel value (end of string) we should stop
+	
+	for (int limit = FENCounter + 4; FENCounter <= limit; FENCounter++ ) { //test edge cases
+		if (board_string[FENCounter] == '-' || board_string[FENCounter] == '\0') {
+			cout << "A new board state is loaded!\n";
+			boardLoaded = true;
+			return;
+		}
+		else if (board_string[FENCounter] == 'K') {
+			//White can castle kingside, stored as bit 0 of castlingOptions
+			castlingOptions |= 0b0001;
+		}
+		else if (board_string[FENCounter] == 'Q') {
+			//White can castle queenside, stored as bit 1
+			castlingOptions |= 0b0010;
+		}
+		else if (board_string[FENCounter] == 'k') {
+			//black can castle kingside, stored as bit 2
+			castlingOptions |= 0b0100;
+		}
+		else if (board_string[FENCounter] == 'q') {
+			//black can castle queenside, stored as bit 3
+			castlingOptions |= 0b1000;
+		}
+	}
+	
+	//if code has reached this point, it means a longer FEN string 
+	//has been loaded with information beyond the spec, so we can ignore it
+	//and cout and return
+	cout << "A new board state is loaded";
+	boardLoaded = true;
 	return;
 }
 
-
-// Defensive programming to ensure first part of FSN string to load
-// a Chess Game is as expected; even if spec says we can assume its
-// valid
+// Helper function to defensively ensure the validity of the board
+// during the loadState function
 bool ChessGame::isValidPiece(char letter, int rank_counter, int file_counter) {
 
 	if (!isalpha(letter)) {
@@ -305,11 +178,6 @@ bool ChessGame::isValidPiece(char letter, int rank_counter, int file_counter) {
 
 	Colour pieceColour = isupper(letter) ? Colour::WHITE : Colour::BLACK;
 	ChessPiece* cp = nullptr;
-
-// Switch only on the letter
-// default to null ptr and return false
-// return true only if not... 
-
 
 	switch (tolower(letter)) {
 		case 'p': {
@@ -351,10 +219,172 @@ bool ChessGame::isValidPiece(char letter, int rank_counter, int file_counter) {
 		pieceColour == Colour::BLACK ? blackCount++ : whiteCount++;
 		return true;
 	}
-
 }
 
-//Overloading the copy constructor for ChessGame objects
+
+
+void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
+	//check load state has been called so there is a valid board to play with
+	if (!boardLoaded) {
+		cout << "You need to load a board, before being able to play a move!\n";
+		return;
+	}
+	
+	//check the game is not already over 
+	if (gameOver) {
+		cout << "Game is already over, you cannot submit a move!\n";
+		return;
+	}
+	
+	//check the move coordinates are valid
+	if (move_from[0] > 'H' || move_from[0] < 'A' || move_from[1] > '8' || 
+			move_from[1] < '1' || move_to[0] > 'H' || move_to[0] < 'A' || move_to[1]
+			> '8' || move_to[1] < '1') {
+		cout << "Invalid board coordinates submitted\n";
+		return;
+	}
+	
+	//check for a piece at move_from square, via helper function getBoardPiece
+	ChessPiece* movedPiece = getBoardPiece(move_from);
+	if (movedPiece == nullptr) {
+		cout << "There is no piece at position " << move_from << "!\n";
+		return;
+	}
+	//if there is a piece, check it matches the colour of whose turn it is
+	else if(movedPiece->pieceColour != whoseTurn) {
+		cout << "It is not " << movedPiece->pieceColour << "'s turn to move!\n";
+		return;
+	}
+	
+	/* The isPieceTaken parameter is updated to true if there is an
+	 * enemy piece in the move_to square. This is passed by reference to the
+	 * isValidMove helper function. If the submitted move is invalid, this is 
+	 * updated back to false. If it remains true, then we take the piece. */
+	bool isPieceTaken = false;
+
+	/* Check if the move_to square is occupied by one of your own pieces as this 
+	 * is always invalid, so we can return immediately without further checks */
+	ChessPiece* takenPiece = getBoardPiece(move_to);
+	// check to not dereference a nullptr
+	if (takenPiece != nullptr) { 
+		if (movedPiece->pieceColour == takenPiece->pieceColour) {
+			cout << whoseTurn << "'s" << movedPiece->pieceName << " cannot move to "
+				<< move_to << "!\n";
+			return;
+		}
+		else {
+			isPieceTaken = true;
+		}
+	}
+	
+	/* We now check the validity of the move according to the movement
+	 * rules of each piece and store the result in validMove. Note: 
+	 * if a move is invalid, the isPieceTaken bool is also set back to false */
+	bool validMove = movedPiece->isValidMove(move_from, move_to, this, 
+			isPieceTaken); 
+
+	/* Even if a move is valid by piece movement rukes, you can't move yourself 
+	 * into check, so we need to check this as well */
+	if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
+		cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
+			<< move_to << "!\n";
+		return;
+	}
+	
+	/*Update the flags below depending on the outcomes of the isValidMove and 
+	 * isPieceTaken bools. This allows us to use the MoveOutcome enum to 
+	 * determine what to do next */
+	int validFlag = validMove ? 0b01 : 0b00;
+	int captureFlag = isPieceTaken ? 0b10 : 0b00;
+	MoveOutcome outcome = static_cast<MoveOutcome>(validFlag | captureFlag);
+	
+	switch(outcome) {
+		case NOT_VALID_MOVE:
+		{
+			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to " 
+				<< move_to << "!\n";
+			return;			
+		}
+		
+		case VALID_WITH_CAPTURE: 
+		{
+			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
+				move_from << " to " << move_to << " taking " << takenPiece->pieceColour
+				<< "'s " << takenPiece->pieceName << "\n";
+			//delete the taken piece from the board
+			delete takenPiece;
+			takenPiece = nullptr;
+
+			// decrement the pieceCounter for the colour whose piece has been taken
+			movedPiece->pieceColour == Colour::BLACK ? whiteCount-- : blackCount--;
+			break;
+		}
+		
+		case VALID_NO_CAPTURE:
+		{
+			cout << whoseTurn << "'s " <<  movedPiece->pieceName << " moves from " <<
+				move_from << " to " << move_to << endl;
+		}
+	}
+
+	/* For both valid with capture, and valid no capture moves, we can now move 
+	 * the piece to its new position, and assign its old position to nullptr */
+	
+	updateBoard(movedPiece, move_from, move_to);
+	whoseTurn = (whoseTurn == Colour::BLACK) ? Colour::WHITE : Colour::BLACK;
+
+	/* Before returning, we need to check if the person whoseTurn is next is
+	 * now in check or in checkmate */
+
+	//We check for check first, as you cannot be in checkmate without check
+	if (isInCheck(whoseTurn)) {
+		if (isInCheckOrStalemate(whoseTurn)) {
+			cout << whoseTurn << " is in checkmate\n";
+			gameOver = true;
+		}
+		else {
+			cout << whoseTurn << " is in check\n";
+		}
+	}
+	else if (isInCheckOrStalemate(whoseTurn)) {
+		cout << whoseTurn << " is in stalemate\n";
+		gameOver = true;
+	}
+
+	return;
+}
+
+
+//getBoardPiece "getter" function
+ChessPiece* ChessGame::getBoardPiece(char const boardPosition[2]) {
+	int file_counter = boardPosition[0] - 'A';
+	int rank_counter = boardPosition[1] - '1'; 
+	ChessPiece* cp = boardState[rank_counter][file_counter];
+	return cp;
+}
+
+
+/* A function I used during coding to check the loadState function was working
+ * as expected but is not used in the final program */
+void ChessGame::displayBoard() {
+	for (int rank_counter = 7; rank_counter >= 0; rank_counter--) {
+		for (int file_counter = 0; file_counter < 8; file_counter++) {
+			if (file_counter != 7) {
+				cout << boardState[rank_counter][file_counter];
+			}
+			else if (file_counter == 7) {
+				cout << boardState[rank_counter][file_counter] << "\n";
+			}
+		}
+	}
+	return;
+}
+
+
+/* Defining the copy constructor for ChessGame objects, so that
+ * deep copies (i.e. a new board on the heap) is created. This is used
+ * in the willBeInCheck function, to test if a move played would 
+ * result in a player putting themselves in check */ 
 ChessGame::ChessGame(const ChessGame& other) {
 	for (int rank = 0; rank < 8; rank++) {
 		for (int file = 0; file < 8; file++) {
@@ -372,7 +402,8 @@ ChessGame::ChessGame(const ChessGame& other) {
 	blackCount = other.blackCount;
 }
 
-//Defining the destructor so we clean up heap allocated memory properly
+/* Defining the destructor so we clean up heap allocated memory properly 
+ * given the explicit definition of the copy constructor */
 ChessGame::~ChessGame() {
 	for (int rank_counter = 7; rank_counter >= 0; rank_counter--) {
 		for (int file_counter = 0; file_counter < 8; file_counter++) {
@@ -382,10 +413,10 @@ ChessGame::~ChessGame() {
 	}
 }
 
-//Assignment operator for deep copying
-//Note I don't actually use this assignment operator anywhere in my code
-//but it is good practice with the rule of 3, to also overload this
-//given I have overloaded the copy constructor
+/* Defining the assignment operator, given the definitions of the
+ * Copy constructor and destructor for the ChessGame class. Note: 
+ * I don't actually use this assignment operator anywhere in my code
+ * but am doing this to abide by good practice (rule of 3) */
 ChessGame& ChessGame::operator=(const ChessGame& other) {
 	if (this != &other) {
 		//clean up whatever the existing 'this' board is
@@ -414,10 +445,11 @@ ChessGame& ChessGame::operator=(const ChessGame& other) {
 }
 
 
-
-
-//capturesPiece function to determine if a submitted move leads to a piece being
-//taken
+/* Helper function to determine if a submitted move leads to a piece being 
+ * taken. This previously was used frequently within my isValidMove function
+ * for ChessPiece classes; but since optimising my code with the bool 
+ * isPieceTaken parameter in submitMove, is rarely required now. It's sole
+ * use is to resolve an edge case re. multiple inheritance with a Queen */
 bool ChessGame::capturesPiece(char const move_from[2], char const move_to[2]) {
 	ChessPiece* takenPiece = getBoardPiece(move_to);
 	if (takenPiece == nullptr) {
@@ -432,21 +464,10 @@ bool ChessGame::capturesPiece(char const move_from[2], char const move_to[2]) {
 };
 
 
-
-//getBoardPiece "getter" function
-ChessPiece* ChessGame::getBoardPiece(char const boardPosition[2]) {
-	int file_counter = boardPosition[0] - 'A';
-	int rank_counter = boardPosition[1] - '1'; 
-	ChessPiece* cp = boardState[rank_counter][file_counter];
-	return cp;
-}
-
-
-//getKing "getter" function
+/* Helper function to determine if a player is in check, by locating
+ * the player's king, and then calling the squareUnderAttack function 
+ * on the King's position */
 bool ChessGame::isInCheck(Colour kingColour) {
-	//we need to allocate the King's position to the heap
-	//so it doesn't get deleted as a local variable and can be
-	//passed onto the checkingCheck function
 	char* kingPosition = new char[2];
 	for (int rank = 0; rank < 8; rank++) {
 		for (int file = 0; file < 8; file++) {
@@ -458,7 +479,7 @@ bool ChessGame::isInCheck(Colour kingColour) {
 				if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
 					kingPosition[0] = file + 'A';
 					kingPosition[1] = rank + '1';
-					//once king position found, see if it is under attack
+					//once the king position found, see if it is under attack
 					bool isCheck = squareUnderAttack(kingPosition, kingColour);
 					delete[] kingPosition; //Free the heap allocated memory
 					return isCheck ? true : false;
@@ -466,11 +487,14 @@ bool ChessGame::isInCheck(Colour kingColour) {
 			}
 		}
 	}
-	// failsafe in case king is not found for whatever reason
+	// failsafe in case king is not found, but should never be reached
 	delete[] kingPosition;
 	throw logic_error("Unreachable code reached in isInCheck function");
 }
 
+
+/* Helper function to determine if a given square in the board is currently 
+ * ine a line of attack from an opponent's piece */
 bool ChessGame::squareUnderAttack(char const board_square[2], 
 		Colour yourPieceColour) {
 	int oppoPieceCount = (yourPieceColour == Colour::BLACK) ? whiteCount : blackCount;
@@ -487,7 +511,7 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 					char letterFile = file + 'A';
 					char letterRank = rank + '1';
 					char cpPosition[2] = {letterFile, letterRank};
-					//by default isPieceTaken is true, here as we are checking if the
+					//by default isPieceTaken is true here, as we are checking if the
 					//square is under attack from an enemy piece.
 					bool isPieceTaken = true;
 					if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
@@ -509,8 +533,8 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 }
 
 
-// Testing if a proposed move that is valid by the rules of Chess takes a King
-// out of Check
+/* Helper function to test if a proposed move that is valid by the rules of 
+ * Chess takes a King into or out of Check */
 bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2], 
 		 char const move_to[2], bool isPieceTaken) {
 	// Create a deep copy of the current board
@@ -530,12 +554,10 @@ bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2],
 		movedPiece->pieceColour == Colour::BLACK ? copiedGame.whiteCount-- : copiedGame.blackCount--;		
 	}
 
-	// Move the piece being moved to the new position on the copied
-	// board
+	// Move the piece being moved to the new position on the copied board
 	copiedGame.updateBoard(movedPiece, move_from, move_to);
 	if (copiedGame.isInCheck(kingColour)) {
-		//destructor overloading should automatically destroy copiedGame as it is
-		//a local variable
+		//Defined destructor automatically destroy copiedGame upon returning
 		return true;
 	}
 	else {
@@ -544,6 +566,9 @@ bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2],
 }
 
 
+/* Helper function to determine if a player has any valid moves left. If they
+ * do not, and they are in check - then they are in checkmate - otherwise they
+ * are in stalemate */
 bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 	int friendlyCount = (kingColour == Colour::BLACK) ? blackCount : whiteCount;
 	//loop through the board to find pieces of your own colour
@@ -553,6 +578,7 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 			if (boardState[rank][file] == nullptr) {
 				continue;
 			}
+
 			else if (boardState[rank][file]->pieceColour == kingColour) {
 				char letterRank = rank + '1';
 				char letterFile = file + 'A';
@@ -566,30 +592,32 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 						char move_to[2] = {moveFile, moveRank};
 
 						//check if the move would be valid by piece movement rules
-						//Copying the logic of submitMove, checking first for if a piece
-						//will be taken				
+						//Copying the logic of submitMove
+
 						bool isPieceTaken = false;
 						ChessPiece* takenPiece = getBoardPiece(move_to);
-						if (takenPiece != nullptr) { //check first to not derefence nullptr
+						if (takenPiece != nullptr) { 
 							if (kingColour == takenPiece->pieceColour) {
-								continue; //invalid move as you can't move to a square of own colour
+								continue; //invalid move
 							}
 							else {
 								isPieceTaken = true;
 							}
 						}
-						if (friendlyPiece-> isValidMove(move_from, move_to, this, isPieceTaken)) {
-							//if valid, check if the move results in the king free from check
-							if (!willBeInCheck(kingColour, move_from, move_to, isPieceTaken)) {
+						if (friendlyPiece-> isValidMove(move_from, move_to, this, 
+									isPieceTaken)) {
+							//if valid, check if the move frees the king from check
+							if (!willBeInCheck(kingColour, move_from, move_to, 
+										isPieceTaken)) {
 								return false; //i.e. not in checkmate
 							}
 						}
 
 					}
 				}
-				// once all board moves for that piece have been exhausted we can
-				// decrement the friendlyCount, and look for the next friendly piece
-				// allows us to avoid iterating through entire board
+				/* once all board moves for that piece have been exhausted we 
+				 * decrement the friendlyCount. Looking only for friendly pieces
+				 * allows us to avoid iterating through entire board */
 				friendlyCount--;
 				if (friendlyCount == 0) {
 					return true; //i.e. no friendly piece can get king out of check
@@ -614,3 +642,6 @@ void ChessGame::updateBoard(ChessPiece* movedPiece, char const move_from[2],
 	int old_rank_position = move_from[1] - '1';
 	boardState[old_rank_position][old_file_position] = nullptr;
 }
+
+
+

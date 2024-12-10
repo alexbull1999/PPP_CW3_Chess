@@ -3,6 +3,11 @@
 
 #include "ChessPiece.h"
 
+/* The Pawn class represents the Pawn pieces on the chess board.
+ * It does not have any attributes or methods that ChessPiece.h
+ * does not already list; but overrides the virtual methods 
+ * declared to ensure they are appropriate for the Pawn context */
+
 class Pawn : public ChessPiece {
 	public:
 		//Pawn Constructor

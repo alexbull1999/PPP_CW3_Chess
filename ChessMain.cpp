@@ -11,6 +11,7 @@ int main() {
 	cout << "========================\n\n";
 
 	ChessGame cg;
+
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
 
@@ -75,7 +76,6 @@ int main() {
 
 	cg.submitMove("D3", "G6");
 	cout << '\n';
-
 
 	return 0;
 }
