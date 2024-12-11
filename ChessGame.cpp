@@ -234,7 +234,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	
 	//check the game is not already over 
 	if (gameOver) {
-		cout << "Game is already over, you cannot submit a move!\n";
+		cout << "Game is already over, you cannot submit a move! Please load a new game.\n";
 		return;
 	}
 	
@@ -270,7 +270,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	// check to not dereference a nullptr
 	if (takenPiece != nullptr) { 
 		if (movedPiece->pieceColour == takenPiece->pieceColour) {
-			cout << whoseTurn << "'s" << movedPiece->pieceName << " cannot move to "
+			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
 				<< move_to << "!\n";
 			return;
 		}

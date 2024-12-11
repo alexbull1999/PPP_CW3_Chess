@@ -12,7 +12,74 @@ int main() {
 
 	ChessGame cg;
 
-	//
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
+	cout << '\n';
+
+	cg.submitMove("D7", "D6");
+	cout << '\n';
+
+	cg.submitMove("D4", "H6");
+	cout << '\n';
+
+	cg.submitMove("D2", "D4");
+	cout << '\n';
+
+	cg.submitMove("F8", "B4");
+	cout << '\n';
+
+	cout << "=========================\n";
+	cout << "Alekhine vs. Vasic (1931)\n";
+	cout << "=========================\n\n";
+
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
+	cout << '\n';
+
+	cg.submitMove("E2", "E4");
+	cg.submitMove("E7", "E6");
+	cout << '\n';
+
+	cg.submitMove("D2", "D4");
+	cg.submitMove("D7", "D5");
+	cout << '\n';
+
+	cg.submitMove("B1", "C3");
+	cg.submitMove("F8", "B4");
+	cout << '\n';
+
+	cg.submitMove("F1", "D3");
+	cg.submitMove("B4", "C3");
+	cout << '\n';
+
+	cg.submitMove("B2", "C3");
+	cg.submitMove("H7", "H6");
+	cout << '\n';
+
+	cg.submitMove("C1", "A3");
+	cg.submitMove("B8", "D7");
+	cout << '\n';
+
+	cg.submitMove("D1", "E2");
+	cg.submitMove("D5", "E4");
+	cout << '\n';
+
+	cg.submitMove("D3", "E4");
+	cg.submitMove("G8", "F6");
+	cout << '\n';
+
+	cg.submitMove("E4", "D3");
+	cg.submitMove("B7", "B6");
+	cout << '\n';
+
+	cg.submitMove("E2", "E6");
+	cg.submitMove("F7", "E6");
+	cout << '\n';
+
+	cg.submitMove("D3", "G6");
+	cout << '\n';
+
+
+	/* Tests I wrote to check my try/catch exceptions deal gracefully with a state where no Kings are loaded
+	 * on a board, or just one King is loaded
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cout << '\n';
@@ -21,6 +88,131 @@ int main() {
 	cg.submitMove("C4", "C5");
 	cg.displayBoard();
 	cout << '\n';
+
+	cg.loadState("8/8/8/3p4/2P5/8/8/4K3 w - - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("C4", "C5");
+	cg.displayBoard();
+	cout << '\n';
+
+	////////End of execeptions tests */
+
+	/* Testing castling kingside for black/white, then commenting out and testing castling queenside
+
+	cg.loadState("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	//cg.submitMove("E1", "G1");
+	//cg.submitMove("E8", "G8");
+	cg.submitMove("E1", "C1");
+	cg.submitMove("E8", "C8");
+	cg.displayBoard();
+	cout << '\n';
+
+	// end of castling tests */
+
+	/* Testing castling when it is invalid i.e. the castling bits have been disabled
+
+	cg.loadState("r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("E1", "E2"); //move king forward should disable white castling
+	cg.submitMove("E8", "E7"); // mirror for black
+	cg.submitMove("E2", "E1"); //move King back into home square
+	cg.submitMove("E7", "E8"); //move King back into home square
+	cg.submitMove("E1", "G1"); // try and castle
+	cg.submitMove("E1", "E2"); // so it goes to black's turn
+	cg.submitMove("E8", "G8"); //try to castle
+
+	// end of tests */
+
+
+
+	/* Testing stalemate behaving as expected and someone trying to play a move when in stalemate
+
+	cg.loadState("7k/8/6K1/8/8/8/8/5Q2 w - - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("F1", "F7");
+	cg.displayBoard();
+	cg.submitMove("H8", "G8");
+
+	// end of stalemate tests */
+
+	/* Illegal move tests
+
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cg.submitMove("E2", "E5"); //invalid, pawns cannot move 3 squares
+	cg.submitMove("D1", "D6"); //invalid, queens cannot jump over pieces
+	cg.submitMove("B1", "D4"); //invalid, knights cannot jump that far
+	cg.submitMove("B2", "B4"); //valid pawn move
+	cg.submitMove("C7", "C5"); //valid pawn move
+	cg.submitMove("A1", "B2"); //invalid, rooks cannot move diagonally
+	cg.submitMove("C1", "B2"); //valid bishop move
+	cg.submitMove("C8", "C7"); //invalid bishop move, cannot move straight forward
+
+	// end of illegal moves tests */
+
+	/* Check and Checkmate Tests, and someone trying to play a move in checkmate
+
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K4 b KQkq - 0 2");
+	cout << '\n';
+	cg.displayBoard();
+	cg.submitMove("E3", "E2"); //this should put white in check
+	cg.submitMove("D1", "E1"); //this should be invalid as white king staying in check
+	cg.submitMove("D1", "C1");
+	cg.submitMove("E2", "E1"); // this should put white in checkmate
+	cg.submitMove("C1", "B1"); // this should be invalid as checkmate already occurred
+
+
+	Variations on the above tests
+
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K3R b KQkq - 0 2");
+	cout << '\n';
+	cg.displayBoard();
+	cg.submitMove("E3", "E2"); //this should put white in check
+	cg.submitMove("D1", "E1"); //this should be invalid as white king staying in check
+	cg.submitMove("H1", "E1"); // this should be invalid as queen could still take diagonally
+	cg.submitMove("D1", "C1"); // this should be valid
+	cg.submitMove("E2", "E1"); // this should put white back in check
+	cg.submitMove("H1", "E1"); // this should take the queen, and put white out of check again
+
+	// end of check and checkmate tests */
+
+	/* Someone starting a new game and submitting a move without calling loadState
+
+	ChessGame cg2;
+	cg2.submitMove("E2", "E4");
+	cg2.submitMove("E3", "E5");
+
+	// end of loadState tests */
+
+	/* Someone trying to take their own piece and someone trying to move to the same square they're on
+
+	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("D1", "D2"); //invalid white queen cannot take white pawn
+	cg.submitMove("D2", "D2"); //invalid pawns can't stand still
+	cg.submitMove("A1", "A1"); //invalid rooks can't stand still
+	cg.submitMove("B1", "B1"); //invalid knight
+	cg.submitMove("C1", "C1"); //invalid bishop
+	cg.submitMove("D1", "D1"); // invalid queen
+	cg.submitMove("E1", "E1"); //invalid king
+
+	// end of tests for invalid moves */
+
+
+
+	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov - (includes castling) and check
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
@@ -92,72 +284,8 @@ int main() {
 	cg.submitMove("A7", "A6");
 	cg.displayBoard();
 
-	//
+	// End of Fischer vs Kholmov test */
 
-	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
-	cout << '\n';
-
-	cg.submitMove("D7", "D6");
-	cout << '\n';
-
-	cg.submitMove("D4", "H6");
-	cout << '\n';
-
-	cg.submitMove("D2", "D4");
-	cout << '\n';
-
-	cg.submitMove("F8", "B4");
-	cout << '\n';
-
-	cout << "=========================\n";
-	cout << "Alekhine vs. Vasic (1931)\n";
-	cout << "=========================\n\n";
-
-	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
-	cout << '\n';
-
-	cg.submitMove("E2", "E4");
-	cg.submitMove("E7", "E6");
-	cout << '\n';
-
-	cg.submitMove("D2", "D4");
-	cg.submitMove("D7", "D5");
-	cout << '\n';
-
-	cg.submitMove("B1", "C3");
-	cg.submitMove("F8", "B4");
-	cout << '\n';
-
-	cg.submitMove("F1", "D3");
-	cg.submitMove("B4", "C3");
-	cout << '\n';
-
-	cg.submitMove("B2", "C3");
-	cg.submitMove("H7", "H6");
-	cout << '\n';
-
-	cg.submitMove("C1", "A3");
-	cg.submitMove("B8", "D7");
-	cout << '\n';
-
-	cg.submitMove("D1", "E2");
-	cg.submitMove("D5", "E4");
-	cout << '\n';
-
-	cg.submitMove("D3", "E4");
-	cg.submitMove("G8", "F6");
-	cout << '\n';
-
-	cg.submitMove("E4", "D3");
-	cg.submitMove("B7", "B6");
-	cout << '\n';
-
-	cg.submitMove("E2", "E6");
-	cg.submitMove("F7", "E6");
-	cout << '\n';
-
-	cg.submitMove("D3", "G6");
-	cout << '\n';
 
 	return 0;
 }
