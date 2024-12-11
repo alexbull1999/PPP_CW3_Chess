@@ -489,7 +489,7 @@ bool ChessGame::isInCheck(Colour kingColour) {
 	}
 	// failsafe in case king is not found, but should never be reached
 	delete[] kingPosition;
-	throw logic_error("Unreachable code reached in isInCheck function");
+	throw logic_error("Error in isInCheck function, your board is missing a King");
 }
 
 

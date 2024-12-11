@@ -14,14 +14,15 @@ class Pawn : public ChessPiece {
 		Pawn(Colour pieceColour, Name pieceName);
 
 		//Pawn clone method
-		ChessPiece* clone() const override;
+		ChessPiece* clone() const override final;
 
 		//isValidMove declaration for Pawn
 		bool isValidMove(char const move_from[2], char const move_to[2], 
-				ChessGame* cg, bool& isPieceTaken) override; 
+				ChessGame* cg, bool& isPieceTaken) override final; 
 		
-		void printPiece(std::ostream&) override;
-		~Pawn() override;
+		void printPiece(std::ostream&) override final;
+
+		~Pawn() override final;
 
 
 };

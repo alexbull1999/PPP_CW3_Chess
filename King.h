@@ -28,19 +28,19 @@ class King : public ChessPiece {
 		King(Colour pieceColour, Name pieceName);
 
 		//King clone method
-		ChessPiece* clone() const override;
+		ChessPiece* clone() const override final;
 
 		//isValidMove declaration for King
 		bool isValidMove(char const move_from[2], char const move_to[2],
-				ChessGame* cg, bool& isPieceTaken) override;
+				ChessGame* cg, bool& isPieceTaken) override final;
 
 		// printPiece function I used during testing to output the piece - the
 		// function enables dynamic binding within the static ostream << operator
-		void printPiece(std::ostream&) override;
+		void printPiece(std::ostream&) override final;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
-		~King() override;
+		~King() override final;
 
 	private:
 		//Helper function to update the castlingOptions attribute if the King has

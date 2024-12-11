@@ -12,6 +12,19 @@ int main() {
 
 	ChessGame cg;
 
+	cg.loadState("8/8/8/3p4/2P5/8/8/4K3 w - - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("C4", "C5");
+	cg.submitMove("C4", "D5");
+	cg.submitMove("D3", "C3");
+	cg.submitMove("C3", "D5");
+	cg.submitMove("F6", "D5");
+	cg.displayBoard();
+
+	/*
+
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
 
@@ -76,6 +89,8 @@ int main() {
 
 	cg.submitMove("D3", "G6");
 	cout << '\n';
+
+	*/
 
 	return 0;
 }

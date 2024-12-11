@@ -14,18 +14,18 @@ class Knight : public ChessPiece {
 		Knight(Colour pieceColour, Name pieceName);
 
 		//Knight clone method
-		ChessPiece* clone() const override;
+		ChessPiece* clone() const override final;
 
 		//isValidMove declaration for Knight
 		bool isValidMove(char const move_from[2], char const move_to[2],
-				ChessGame* cg, bool& isPieceTaken) override;
+				ChessGame* cg, bool& isPieceTaken) override final;
 
 		// printPiece function I used during testing to output the piece - the
-			void printPiece(std::ostream&) override;
+			void printPiece(std::ostream&) override final;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. through dynamic binding)
-		~Knight() override;
+		~Knight() override final;
 
 
 };

@@ -18,7 +18,7 @@ class Queen : public Bishop, Rook {
 		Queen(Colour pieceColour, Name pieceName);
 
 		//Queen clone method
-		ChessPiece* clone() const override;
+		ChessPiece* clone() const override final;
 
 		//isValidMove declaration for Queen
 		bool isValidMove(char const move_from[2], char const move_to[2],
@@ -26,11 +26,11 @@ class Queen : public Bishop, Rook {
 
 		// printPiece function I used during testing to output the piece - the
 		// function enables dynamic binding within the static ostream << operator
-		void printPiece(std::ostream&) override;
+		void printPiece(std::ostream&) override final;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
-		~Queen() override;
+		~Queen() override final;
 
 
 };
