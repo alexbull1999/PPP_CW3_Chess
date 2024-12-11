@@ -38,7 +38,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 		return false;
 	}
 
-	//Determine the direciton the Rook is moving in
+	//Determine the direction the Rook is moving in
 	int rankDirection;
 	int fileDirection;
 	if (move_to[1] > move_from[1]) {
@@ -57,7 +57,7 @@ bool Rook::isValidMove(char const move_from[2], char const move_to[2],
 	else if (move_to[0] > move_from[0]) {
 		fileDirection = 1; //moving horizontally to the right
 	}
-	else if (move_to[0] < move_from[0]) {
+	else {
 		fileDirection = -1; //moving horizontally to the left
 	}
 
@@ -126,21 +126,21 @@ void Rook::updateCastlingOptions(char const move_from[2],
 	if (rookColour == Colour::BLACK) {
 		if (move_from[0] == 'A') {
 			//disable black queenside castlingOptions
-			cg->castlingOptions &= ~0b1000;
+			cg->castlingOptions &= ~CASTLE_BLACK_QUEENSIDE;
 		}
 		else if (move_from[0] == 'H') {
 			//disable black kingside castling
-			cg->castlingOptions &= ~0b0100;
+			cg->castlingOptions &= ~CASTLE_BLACK_KINGSIDE;
 		}
 	}
 	else if (rookColour == Colour::WHITE) {
 		if (move_from[0] == 'A') {
 			//disable white queenside castling
-			cg->castlingOptions &= ~0b0010;
+			cg->castlingOptions &= ~CASTLE_WHITE_QUEENSIDE;
 		}
 		else if (move_from[0] == 'H') {
 			//disable white kingside castling
-			cg->castlingOptions &= ~0b0001;
+			cg->castlingOptions &= ~CASTLE_WHITE_KINGSIDE;
 		}
 	}
 }

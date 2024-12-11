@@ -122,10 +122,21 @@
  *     char const move_to[2]
  *   - Functionality: A helper function to update the boardState once all
  *     checks have been completed on a submitted move to ensure it is valid
+ *
+ * - isValidCoord:
+ *	 - Return type: bool
+ *	 - Parameters: char const coord[2]
+ *	 - Functionality: Helper function to check a board coordinate submitted is valid
+ *	   (i.e. A-H, 1-8)
  * */
 
 
-int const MAX_FEN_LENGTH = 90;
+const int MAX_FEN_LENGTH = 90;
+const int CASTLE_WHITE_KINGSIDE = 0b0001;
+const int CASTLE_WHITE_QUEENSIDE = 0b0010;
+const int CASTLE_BLACK_KINGSIDE = 0b0100;
+const int CASTLE_BLACK_QUEENSIDE = 0b1000;
+const int NO_CASTLING = 0b0000;
 
 
 //declaring Colour enum and signalling it will be overloaded for ostreams
@@ -199,7 +210,8 @@ class ChessGame {
 
 		void updateBoard(ChessPiece* movedPiece, char const move_from[2], 
 				char const move_to[2]);
-		
+
+		bool isValidCoordinate(char const coord[2]);
 };
 
 

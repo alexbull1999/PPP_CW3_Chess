@@ -67,12 +67,12 @@ void King::updateCastlingOptions(Colour kingColour, ChessGame* cg) {
 	if (kingColour == Colour::BLACK) {
 		/*use bitwise and with bitwise not to update castlingOptions to show no
 		 * castling possibilities for black (clear bits 2 and 3) */
-		cg->castlingOptions &= ~0b1100; 
+		cg->castlingOptions &= ~(CASTLE_BLACK_KINGSIDE | CASTLE_BLACK_QUEENSIDE);
 	}
 	else if (kingColour == Colour::WHITE) {
 		/* Mirror logic but to disable white castling possibilities
 		 * (clear bits 0 and 1) */
-		cg->castlingOptions &= ~0b0011;
+		cg->castlingOptions &= ~(CASTLE_WHITE_KINGSIDE | CASTLE_WHITE_QUEENSIDE);
 	}
 }
 
@@ -96,7 +96,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 	//now check if the correct castling options are available
 	//option 1 black castling kingside
 	if(!strcmp(move_to, "G8")) {
-		if (!(cg->castlingOptions & 0b0100)) {
+		if (!(cg->castlingOptions & CASTLE_BLACK_KINGSIDE)) {
 			return false; // as black kingside castling is unavailable
 		}
 		/*check that the rook hasn't been taken that you are trying to castle with 
@@ -130,7 +130,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 
 	//option 2 black castling queenside
 	if(!strcmp(move_to, "C8")) {
-		if (!(cg->castlingOptions & 0b1000)) {
+		if (!(cg->castlingOptions & CASTLE_BLACK_QUEENSIDE)) {
 			return false; // as black queenside castling is unavailable
 		}
 		/* check that the rook hasn't been taken that you are trying to
@@ -164,7 +164,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 
 	//option 3 white castling kingside
 	if(!strcmp(move_to, "G1")) {
-		if (!(cg->castlingOptions & 0b0001)) {
+		if (!(cg->castlingOptions & CASTLE_WHITE_KINGSIDE)) {
 			return false; // as white kingside castling is unavailable
 		}
 		/* check that the rook hasn't been taken that you are trying to
@@ -198,7 +198,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 	
 	//option 4 white castling queenside
 	if(!strcmp(move_to, "C1")) {
-		if (!(cg->castlingOptions & 0b0010)) {
+		if (!(cg->castlingOptions & CASTLE_WHITE_KINGSIDE)) {
 			return false; // as white queenside castling is unavailable
 		}
 		/* check that the rook hasn't been taken that you are trying to

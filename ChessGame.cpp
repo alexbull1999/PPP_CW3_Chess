@@ -62,41 +62,36 @@ ChessGame::ChessGame() : boardState(), whoseTurn(Colour::WHITE), whiteCount(0),
 
 void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 	
-	// first clean the ChessGame board in case there was a previous game
-	for (int rank_counter = 0; rank_counter < 8; rank_counter++) {
-		for (int file_counter = 0; file_counter < 8; file_counter++) {
-			if (boardState[rank_counter][file_counter] == nullptr) {
-				continue;
-			}
-			else {
+	// first clean the ChessGame board if there was a previous game
+	if (boardLoaded) {
+		for (int rank_counter = 0; rank_counter < 8; rank_counter++) {
+			for (int file_counter = 0; file_counter < 8; file_counter++) {
 				delete boardState[rank_counter][file_counter];
 				boardState[rank_counter][file_counter] = nullptr;
 			}
 		}
+		//reset whiteCount, blackCount, and castlingOptions attributes
+		whiteCount = 0;
+		blackCount = 0;
+		castlingOptions = NO_CASTLING;
 	}
 
-	//reset whiteCount, blackCount, and castlingOptions attributes in case
-	//they were changed in a previous game
-	whiteCount = 0;
-	blackCount = 0;
-	castlingOptions = 0b0000; 
-
-	// now we can create a new board state, using a helper function isValidPiece
-	// to defensively check the validity of the FEN string provided to us
+	/* now we can create a new board state, using a helper function isValidPiece
+	 * to defensively check the validity of the FEN string provided to us */
 	int FENCounter = 0;
 	for (int rank_counter = 7, file_counter = 0; board_string[FENCounter] != ' ';
 			FENCounter++) {
 		
-		if (rank_counter < 0) {
+		/* if (rank_counter < 0) {
 			cerr << "Warning - error; rank_counter has gone below 0";
-		}
+		}  (this if branched was used in testing, but not needed anymore) */
 
 		if (isValidPiece(board_string[FENCounter], rank_counter, file_counter)) {
 			file_counter++;
 			continue;
 		}
 
-		else if (board_string[FENCounter] >= '1' && 
+		if (board_string[FENCounter] >= '1' &&
 				board_string[FENCounter] <= '8') {
 			for (int emptyCount = '0'; emptyCount < board_string[FENCounter]; 
 					emptyCount++) {
@@ -145,19 +140,19 @@ void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 		}
 		else if (board_string[FENCounter] == 'K') {
 			//White can castle kingside, stored as bit 0 of castlingOptions
-			castlingOptions |= 0b0001;
+			castlingOptions |= CASTLE_WHITE_KINGSIDE;
 		}
 		else if (board_string[FENCounter] == 'Q') {
 			//White can castle queenside, stored as bit 1
-			castlingOptions |= 0b0010;
+			castlingOptions |= CASTLE_WHITE_QUEENSIDE;
 		}
 		else if (board_string[FENCounter] == 'k') {
 			//black can castle kingside, stored as bit 2
-			castlingOptions |= 0b0100;
+			castlingOptions |= CASTLE_BLACK_KINGSIDE;
 		}
 		else if (board_string[FENCounter] == 'q') {
 			//black can castle queenside, stored as bit 3
-			castlingOptions |= 0b1000;
+			castlingOptions |= CASTLE_BLACK_QUEENSIDE;
 		}
 	}
 	
@@ -239,9 +234,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	}
 	
 	//check the move coordinates are valid
-	if (move_from[0] > 'H' || move_from[0] < 'A' || move_from[1] > '8' || 
-			move_from[1] < '1' || move_to[0] > 'H' || move_to[0] < 'A' || move_to[1]
-			> '8' || move_to[1] < '1') {
+	if (!isValidCoordinate(move_from) || !isValidCoordinate(move_to)) {
 		cout << "Invalid board coordinates submitted\n";
 		return;
 	}
@@ -483,7 +476,7 @@ bool ChessGame::capturesPiece(char const move_from[2], char const move_to[2]) {
  * the player's king, and then calling the squareUnderAttack function 
  * on the King's position */
 bool ChessGame::isInCheck(Colour kingColour) {
-	char* kingPosition = new char[2];
+	char kingPosition[2];
 	try {
 		for (int rank = 0; rank < 8; rank++) {
 			for (int file = 0; file < 8; file++) {
@@ -496,15 +489,12 @@ bool ChessGame::isInCheck(Colour kingColour) {
 						kingPosition[0] = file + 'A';
 						kingPosition[1] = rank + '1';
 						//once the king position found, see if it is under attack
-						bool isCheck = squareUnderAttack(kingPosition, kingColour);
-						delete[] kingPosition; //Free the heap allocated memory
-						return isCheck ? true : false;
+						return squareUnderAttack(kingPosition, kingColour);
 					}
 				}
 			}
 		}
 		// failsafe in case king is not found, but should never be reached
-		delete[] kingPosition;
 		throw logic_error("The board is already missing a King, please reload a new board state");
 	} catch (logic_error& error) {
 		gameOver = true;
@@ -549,8 +539,8 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 		}
 	}
 	//flow of control should never reach this far but adding a failsafe 
-	throw logic_error("Unreachable code in squareUnderAttack function; you are likely already  missing a King and need"
-				   "to reload the board state with a new game.");
+	throw logic_error("Unreachable code in squareUnderAttack function; you are likely already missing a King "
+				   "and need to reload the board state with a new game.");
 }
 
 
@@ -666,5 +656,8 @@ void ChessGame::updateBoard(ChessPiece* movedPiece, char const move_from[2],
 	boardState[old_rank_position][old_file_position] = nullptr;
 }
 
+bool ChessGame::isValidCoordinate(char const coord[2]) {
+	return coord[0] >= 'A' && coord[0] <= 'H' && coord[1] >= '1' && coord[1] <= '8';
+}
 
 

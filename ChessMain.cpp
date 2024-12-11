@@ -98,14 +98,21 @@ int main() {
 
 	////////End of exceptions tests */
 
+	/* Tests for invalid board coordinates
+
+	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
+	cg.submitMove("K8", "B9");
+
+	//end of tests */
+
 	/* Testing castling kingside for black/white, then commenting out and testing castling queenside
 
 	cg.loadState("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
 	cg.displayBoard();
 	cout << '\n';
-	//cg.submitMove("E1", "G1");
-	//cg.submitMove("E8", "G8");
+	cg.submitMove("E1", "G1");
+	cg.submitMove("E8", "G8");
 	cg.submitMove("E1", "C1");
 	cg.submitMove("E8", "C8");
 	cg.displayBoard();
