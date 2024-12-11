@@ -77,7 +77,6 @@ int main() {
 	cg.submitMove("D3", "G6");
 	cout << '\n';
 
-
 	/* Tests I wrote to check my try/catch exceptions deal gracefully with a state where no Kings are loaded
 	 * on a board, or just one King is loaded
 
@@ -97,7 +96,7 @@ int main() {
 	cg.displayBoard();
 	cout << '\n';
 
-	////////End of execeptions tests */
+	////////End of exceptions tests */
 
 	/* Testing castling kingside for black/white, then commenting out and testing castling queenside
 
@@ -129,7 +128,6 @@ int main() {
 	cg.submitMove("E8", "G8"); //try to castle
 
 	// end of tests */
-
 
 
 	/* Testing stalemate behaving as expected and someone trying to play a move when in stalemate
@@ -172,7 +170,7 @@ int main() {
 	cg.submitMove("C1", "B1"); // this should be invalid as checkmate already occurred
 
 
-	Variations on the above tests
+	//Variations on the above tests
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K3R b KQkq - 0 2");
 	cout << '\n';
@@ -183,6 +181,16 @@ int main() {
 	cg.submitMove("D1", "C1"); // this should be valid
 	cg.submitMove("E2", "E1"); // this should put white back in check
 	cg.submitMove("H1", "E1"); // this should take the queen, and put white out of check again
+
+	//further variations involving check with a knight
+	cg.loadState("rnb1kb1r/pppppppp/8/8/8/4q3/nPPPPPPP/3K3R b KQkq - 0 2");
+	cout << '\n';
+	cg.displayBoard();
+	cg.submitMove("A2", "C3"); //this should put white in check through the knight
+	cg.submitMove("H1", "E1"); //should be invalid
+	cg.submitMove("D1", "C1"); //should be valid
+	cg.submitMove("C3", "D1"); //valid but not in check
+	cg.displayBoard();
 
 	// end of check and checkmate tests */
 
