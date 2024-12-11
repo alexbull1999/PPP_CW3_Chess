@@ -7,8 +7,8 @@
 /* The Queen class represents the Queen pieces on the chess board.
  * It does not have any attributes or methods that ChessPiece.h
  * does not already list. It utilises multiple inheritance to inherit
- * both from Rook and Bishop classes, and in doing so does not need to
- * define any new code for its own isValidMove function. */
+ * both from Rook and Bishop classes, and in doing so requires a minimum amount of
+ * new code for its isValidMove function. */
  
 
 class Queen : public Bishop, Rook {

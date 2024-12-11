@@ -17,7 +17,7 @@
  *    ChessGame* cg, and bool& isPieceTaken)
  *  - Functionality:
  *    This pure virtual method allows each ChessPiece to define their own
- *    rules for what constitues a valid move, according to how that piece is
+ *    rules for what constitutes a valid move, according to how that piece is
  *    allowed to move in Chess
  *
  *  - A pure virtual method, clone, of return type ChessPiece*, that is used

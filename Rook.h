@@ -21,7 +21,7 @@
  * char const move_from[2], char const move_to[2], Colour rookColour, and
  * ChessGame* cg.
  * The purpose of this function is to check if a Rook is moving from its home
- * square, and if so, to disable the appropraite castling option. 
+ * square, and if so, to disable the appropriate castling option.
  * */
 
 
