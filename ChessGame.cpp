@@ -139,6 +139,7 @@ void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 	for (int limit = FENCounter + 4; FENCounter <= limit; FENCounter++ ) { //test edge cases
 		if (board_string[FENCounter] == '-' || board_string[FENCounter] == '\0') {
 			cout << "A new board state is loaded!\n";
+			gameOver = false; //in case it had been set to true in a previous game
 			boardLoaded = true;
 			return;
 		}
@@ -164,6 +165,7 @@ void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 	//has been loaded with information beyond the spec, so we can ignore it
 	//and cout and return
 	cout << "A new board state is loaded";
+	gameOver = false; //in case it had been set to true in a previous game
 	boardLoaded = true;
 	return;
 }
@@ -285,9 +287,14 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 
 	/* Even if a move is valid by piece movement rukes, you can't move yourself 
 	 * into check, so we need to check this as well */
-	if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
-		cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
+	try {
+		if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
+			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
 			<< move_to << "!\n";
+			return;
+		}
+	} catch (logic_error& e) {
+		cout << "Game Over: " << e.what() << "\n";
 		return;
 	}
 	
@@ -305,7 +312,9 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 				<< move_to << "!\n";
 			return;			
 		}
-		
+
+		/* Note, we never worry about dereferencing a nullptr for takenPiece in this case
+		 * since the captureFlag indicates by necessity that takenPiece is not null */
 		case VALID_WITH_CAPTURE: 
 		{
 			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
@@ -337,20 +346,23 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	 * now in check or in checkmate */
 
 	//We check for check first, as you cannot be in checkmate without check
-	if (isInCheck(whoseTurn)) {
-		if (isInCheckOrStalemate(whoseTurn)) {
-			cout << whoseTurn << " is in checkmate\n";
+	try {
+		if (isInCheck(whoseTurn)) {
+			if (isInCheckOrStalemate(whoseTurn)) {
+				cout << whoseTurn << " is in checkmate\n";
+				gameOver = true;
+			}
+			else {
+				cout << whoseTurn << " is in check\n";
+			}
+		}
+		else if (isInCheckOrStalemate(whoseTurn)) {
+			cout << whoseTurn << " is in stalemate\n";
 			gameOver = true;
 		}
-		else {
-			cout << whoseTurn << " is in check\n";
-		}
+	} catch (const logic_error& e) {
+		cout << "Game Over: " << e.what() << "\n";
 	}
-	else if (isInCheckOrStalemate(whoseTurn)) {
-		cout << whoseTurn << " is in stalemate\n";
-		gameOver = true;
-	}
-
 	return;
 }
 
@@ -400,6 +412,9 @@ ChessGame::ChessGame(const ChessGame& other) {
 	whoseTurn = other.whoseTurn;
 	whiteCount = other.whiteCount;
 	blackCount = other.blackCount;
+	castlingOptions = other.castlingOptions;
+	gameOver = other.gameOver;
+	boardLoaded = other.boardLoaded;
 }
 
 /* Defining the destructor so we clean up heap allocated memory properly 
@@ -469,27 +484,32 @@ bool ChessGame::capturesPiece(char const move_from[2], char const move_to[2]) {
  * on the King's position */
 bool ChessGame::isInCheck(Colour kingColour) {
 	char* kingPosition = new char[2];
-	for (int rank = 0; rank < 8; rank++) {
-		for (int file = 0; file < 8; file++) {
-			if (boardState[rank][file] == nullptr) {
-				continue;				
-			}
-			else {
-				ChessPiece* cp = boardState[rank][file];
-				if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
-					kingPosition[0] = file + 'A';
-					kingPosition[1] = rank + '1';
-					//once the king position found, see if it is under attack
-					bool isCheck = squareUnderAttack(kingPosition, kingColour);
-					delete[] kingPosition; //Free the heap allocated memory
-					return isCheck ? true : false;
+	try {
+		for (int rank = 0; rank < 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				if (boardState[rank][file] == nullptr) {
+					continue;
+				}
+				else {
+					ChessPiece* cp = boardState[rank][file];
+					if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
+						kingPosition[0] = file + 'A';
+						kingPosition[1] = rank + '1';
+						//once the king position found, see if it is under attack
+						bool isCheck = squareUnderAttack(kingPosition, kingColour);
+						delete[] kingPosition; //Free the heap allocated memory
+						return isCheck ? true : false;
+					}
 				}
 			}
 		}
+		// failsafe in case king is not found, but should never be reached
+		delete[] kingPosition;
+		throw logic_error("The board is already missing a King, please reload a new board state");
+	} catch (logic_error& error) {
+		gameOver = true;
+		throw; //rethrow the error
 	}
-	// failsafe in case king is not found, but should never be reached
-	delete[] kingPosition;
-	throw logic_error("Error in isInCheck function, your board is missing a King");
 }
 
 
@@ -529,7 +549,8 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 		}
 	}
 	//flow of control should never reach this far but adding a failsafe 
-	throw logic_error("Unreachable code reached in squareUnderAttack function");
+	throw logic_error("Unreachable code in squareUnderAttack function; you are likely already  missing a King and need"
+				   "to reload the board state with a new game.");
 }
 
 
@@ -625,7 +646,9 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 			}
 		}
 	}
-	//flow of control should never reach here
+	/* flow of control should never reach here
+	 * isInCheckmate only ever called after isInCheck function, so if the board is missing a King, an error will
+	 * already have been thrown by this isInCheck function */
 	throw logic_error("Unreachable code reached in isInCheckmate function");
 }
 

@@ -14,7 +14,7 @@
  *		- Functionality: Update the castling options available to a player
  *		  if their King moves from their home square
  *	- checkForCastlingMove:
- *		- Return type: vool
+ *		- Return type: bool
  *		- Parameters: char const move_from[2], char const move_to[2],
  *		  ChessGame* cg.
  *		- Functionality: Checks if a King's submitted move is trying to make
