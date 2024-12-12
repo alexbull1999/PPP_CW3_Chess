@@ -1,7 +1,6 @@
 #include "ChessPiece.h"
 #include "Bishop.h"
 #include <iostream>
-#include <cstdlib> //for abs() function
 
 using namespace std;
 
@@ -25,7 +24,8 @@ void Bishop::printPiece(ostream& os) {
 	}
 };
 
-//Getter for the piece name, returning a string literal representing the name of a piece
+//Getter for the piece name, returning a string literal representing
+//the name of a piece
 const char* Bishop::getPieceName() const { return "Bishop"; }
 
 bool Bishop::isValidMove(char const move_from[2], char const move_to[2],

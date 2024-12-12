@@ -26,7 +26,8 @@ void King::printPiece(ostream& os) {
 	}
 };
 
-//Getter for the piece name, returning a string literal representing the name of a piece
+//Getter for the piece name, returning a string literal
+//representing the name of a piece
 const char* King::getPieceName() const { return "King"; }
 
 
@@ -100,8 +101,8 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		if (!(cg->castlingOptions & CASTLE_BLACK_KINGSIDE)) {
 			return false; // as black kingside castling is unavailable
 		}
-		/*check that the rook hasn't been taken that you are trying to castle with 
-		 * (castlingOptions only updates if the Rook moves, not if taken) */
+		/*check that the rook hasn't been taken that you are trying to castle
+		 *with (castlingOptions only updates if the Rook moves, not if taken) */
 		ChessPiece* cp = cg->getBoardPiece("H8");
 		if (!cp) {
 			return false; //i.e. no rook there, so we avoid dereferencing nullptr

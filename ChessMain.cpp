@@ -78,8 +78,8 @@ int main() {
 	cout << '\n';
 
 
-	/* Tests I wrote to check my try/catch exceptions deal gracefully with a state where no Kings are loaded
-	 * on a board, or just one King is loaded
+	/* Tests I wrote to check my try/catch exceptions deal gracefully with a
+	 * state where no Kings are loaded on a board, or just one King is loaded */
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cout << '\n';
@@ -99,14 +99,15 @@ int main() {
 
 	////////End of exceptions tests */
 
-	/* Tests for invalid board coordinates
+	/* Tests for invalid board coordinates */
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cg.submitMove("K8", "B9");
 
 	//end of tests */
 
-	/* Testing castling kingside for black/white, then commenting out and testing castling queenside
+	/* Testing castling kingside for black/white, then commenting out
+	 * and testing castling queenside */
 
 	cg.loadState("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -121,7 +122,8 @@ int main() {
 
 	// end of castling tests */
 
-	/* Testing castling when it is invalid i.e. the castling bits have been disabled
+	/* Testing castling when it is invalid i.e. the castling
+	 * bits have been disabled */
 
 	cg.loadState("r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -137,7 +139,24 @@ int main() {
 
 	// end of tests */
 
-	/* Testing castling through check or when in check
+	/* Testing castling when it is invalid i.e. the castling
+	 * bits have been disabled this time by rooks */
+
+	cg.loadState("r3k2r/1ppp1ppp/8/8/8/8/PPPP1PP1/R3K2R w KQkq - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("H1", "H2"); //move rook forward should
+	cg.submitMove("A8", "A7"); // mirror for black
+	cg.submitMove("H2", "H1"); //move rook back
+	cg.submitMove("A7", "A8"); //move rook back
+	cg.submitMove("E1", "G1"); // try and castle
+	cg.submitMove("E1", "E2"); // so it goes to black's turn
+	cg.submitMove("E8", "C8"); //try to castle
+
+	// end of tests */
+
+	/* Testing castling through check or when in check */
 	cg.loadState("r3k2r/8/4Q3/8/8/7q/8/R3K2R w KQkq - 0 1");
 	cout << '\n';
 	cg.displayBoard();
@@ -149,7 +168,8 @@ int main() {
 	// ending castling tests */
 
 
-	/* Testing stalemate behaving as expected and someone trying to play a move when in stalemate
+	/* Testing stalemate behaving as expected and someone trying to
+	 * play a move when in stalemate */
 
 	cg.loadState("7k/8/6K1/8/8/8/8/5Q2 w - - 0 1");
 	cout << '\n';
@@ -161,7 +181,7 @@ int main() {
 
 	// end of stalemate tests */
 
-	/* Illegal move tests
+	/* Illegal move tests */
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	cout << '\n';
@@ -173,20 +193,20 @@ int main() {
 	cg.submitMove("C7", "C5"); //valid pawn move
 	cg.submitMove("A1", "B2"); //invalid, rooks cannot move diagonally
 	cg.submitMove("C1", "B2"); //valid bishop move
-	cg.submitMove("C8", "C7"); //invalid bishop move, cannot move straight forward
+	cg.submitMove("C8", "C7"); //invalid bishop move, cannot move vertically
 
 	// end of illegal moves tests */
 
-	/* Check and Checkmate Tests, and someone trying to play a move in checkmate
+	/* Check and Checkmate Tests, and someone trying to play a move in checkmate */
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K4 b KQkq - 0 2");
 	cout << '\n';
 	cg.displayBoard();
 	cg.submitMove("E3", "E2"); //this should put white in check
-	cg.submitMove("D1", "E1"); //this should be invalid as white king staying in check
+	cg.submitMove("D1", "E1"); //this should be invalid as king stays in check
 	cg.submitMove("D1", "C1");
 	cg.submitMove("E2", "E1"); // this should put white in checkmate
-	cg.submitMove("C1", "B1"); // this should be invalid as checkmate already occurred
+	cg.submitMove("C1", "B1"); // this should be invalid as already checkmate
 
 
 	//Variations on the above tests
@@ -195,17 +215,17 @@ int main() {
 	cout << '\n';
 	cg.displayBoard();
 	cg.submitMove("E3", "E2"); //this should put white in check
-	cg.submitMove("D1", "E1"); //this should be invalid as white king staying in check
-	cg.submitMove("H1", "E1"); // this should be invalid as queen could still take diagonally
+	cg.submitMove("D1", "E1"); //this should be invalid as  king stays in check
+	cg.submitMove("H1", "E1"); // invalid as queen could still take diagonally
 	cg.submitMove("D1", "C1"); // this should be valid
 	cg.submitMove("E2", "E1"); // this should put white back in check
-	cg.submitMove("H1", "E1"); // this should take the queen, and put white out of check again
+	cg.submitMove("H1", "E1"); // takes the queen, puts white out of check
 
 	//further variations involving check with a knight
 	cg.loadState("rnb1kb1r/pppppppp/8/8/8/4q3/nPPPPPPP/3K3R b KQkq - 0 2");
 	cout << '\n';
 	cg.displayBoard();
-	cg.submitMove("A2", "C3"); //this should put white in check through the knight
+	cg.submitMove("A2", "C3"); //white in check through the knight
 	cg.submitMove("H1", "E1"); //should be invalid
 	cg.submitMove("D1", "C1"); //should be valid
 	cg.submitMove("C3", "D1"); //valid but not in check
@@ -213,7 +233,7 @@ int main() {
 
 	// end of check and checkmate tests */
 
-	/* Someone starting a new game and submitting a move without calling loadState
+	/* Someone starting a new game, submitting a move without calling loadState */
 
 	ChessGame cg2;
 	cg2.submitMove("E2", "E4");
@@ -221,7 +241,8 @@ int main() {
 
 	// end of loadState tests */
 
-	/* Someone trying to take their own piece and someone trying to move to the same square they're on
+	/* Someone trying to take their own piece
+	 * and someone trying to move to the same square they're on */
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
@@ -239,7 +260,8 @@ int main() {
 
 
 
-	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov - (includes castling) and check
+	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov -
+	 * (includes castling) and check */
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';

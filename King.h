@@ -24,36 +24,50 @@
 
 class King : public ChessPiece {
 	public:
-		//King Constructor
+
+		/*@brief: Pawn Constructor
+		* @params: pieceColour, the colour of the piece being created */
 		King(Colour pieceColour);
 
-		//King clone method
-		ChessPiece* clone() const override final;
+		//King clone method, now entirely redundant
+		ChessPiece* clone() const override;
 
-		//isValidMove declaration for King
+		/*@brief: a function to determine whether a submitted move is legal
+		* according to a pawn's movement rules
+		*@params: move_from, the square being moved from
+		* move_to, the square being moved to
+		* cg, an instance of a ChessGame object passed as a pointer */
 		bool isValidMove(char const move_from[2], char const move_to[2],
-				ChessGame* cg) override final;
+				ChessGame* cg) override;
 
-		// printPiece function I used during testing to output the piece - the
-		// function enables dynamic binding within the static ostream << operator
-		void printPiece(std::ostream&) override final;
+		/*@brief: A helper function so displayBoard() works correctly
+		*Allows us to make use of dynamic binding within ostream overloading,
+		*so the correct piece name is printed each time from the 2d boardState
+		* array */
+		void printPiece(std::ostream&) override;
 
-		//Getter for the piece name, returning a string literal representing the name of a piece
+		/*@brief: A getter function that the queen can use to
+		* define and then access its own name */
 		const char* getPieceName() const override;
 
-		// overriding the ChessPiece virtual destructor, so memory management works
-		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
-		~King() override final;
+		/* @brief: overriding the virtual ChessPiece destructor to ensure
+		* proper memory management during implicit pointer conversion */
+		~King() override;
 
 	private:
-		//Helper function to update the castlingOptions attribute if the King has
-		//moved - signalling castling no longer available
+		/*@brief: Helper function to update the castlingOptions attribute
+		 *if the King has moved - signalling castling no longer available
+		 * @params: kingColour, the colour of the king being moved
+		 * cg: a pointer to the ChessGame object in which to update the castling
+		 * options
+		 */
 		void updateCastlingOptions(Colour kingColour, ChessGame* cg);
 
-		//Helper function to determine if a King is trying to castle and doing so
-		//validly or not (from my research online, it seems that castling should be
-		//interpreted as the King's move, and hence a player trying to castle would
-		//submit a move of e.g. ("E1", "G1"))
+		/* @brief: Helper function to determine if a King is trying to castle,
+		 * and if they are doing so validly or not (from my research online,
+		 * it seems that castling should be interpreted as the King's move,
+		 * and hence a player trying to castle would submit a move of
+		 * e.g. ("E1", "G1")) */
 		bool checkForCastlingMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg);
 

@@ -6,16 +6,11 @@
 
 /* The Rook class represents the Rook pieces on the chess board.
  * It overrides the virtual methods declared in ChessPiece.h to ensure 
- * they are appropriate for the Rook context. Unlike the Pawn, Knight and King 
- * chess piece classes, Rook (and Bishop) use
- * virtual public inheritance from the abstract chess piece class to allow 
- * multiple inheritance with the Queen class, whilst avoiding the 
- * 'diamond problem' of the Queen doubly inheriting ChessPiece 
+ * they are appropriate for the Rook context.
  *
  * Furthermore, in addition to the methods declared in ChessPiece.h, Rook.h
- * defines an additional method for the Rook class, updateCastlingOptions.
- * This function is private, as we do not want the Queen who inherits from
- * Rook (and Bishop), to have access to updateCastlingOptions
+ * defines an additional private method for the Rook class,
+ * updateCastlingOptions.
  *
  * This function is of return type void, and takes input parameters of
  * char const move_from[2], char const move_to[2], Colour rookColour, and
@@ -27,30 +22,46 @@
 
 class Rook : public ChessPiece {
 	public:
-		//Rook Constructor
+
+		/*@brief: Rook Constructor
+		* @params: pieceColour, the colour of the piece being created */
 		Rook(Colour pieceColour);
 		
-		//Rook clone method
+		//Rook clone method now redundant, and not used at all
 		ChessPiece* clone() const override;
 
-		//isValidMove declaration for Rook
-		bool isValidMove(char const move_from[2], char const move_to[2], 
+		/*@brief: a function to determine whether a submitted move is legal
+		* according to a rook's movement rules
+		*@params: move_from, the square being moved from
+		* move_to, the square being moved to
+		* cg, an instance of a ChessGame object passed as a pointer
+		*/
+		bool isValidMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg) override;
 
-		// printPiece function I used during testing to output the piece - the
-		// function enables dynamic binding within the static ostream << operator
+		/*@brief: A helper function so displayBoard() works correctly
+		*Allows us to make use of dynamic binding within ostream overloading,
+		*so the correct piece name is printed each time from the 2d boardState
+		* array */
 		void printPiece(std::ostream&) override;
 
-		//Getter for the piece name, returning a string literal representing the name of a piece
+		/*@brief: A getter function that the queen can use to
+		* define and then access its own name */
 		const char* getPieceName() const override;
 
-		// overriding the ChessPiece virtual destructor, so memory management works
-		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
+		/* @brief: overriding the virtual ChessPiece destructor to ensure
+		* proper memory management during implicit pointer conversion */
 		~Rook() override;
 
 	private:
-		//Helper function to update the castlingOptions attribute if the Rook has
-		//moved - signalling castling no longer available
+		/*@brief: helper function to determine if a rook has moved from its
+		 *home square, and update the bits used to represent castling options
+		 * in a chess game if so
+		 * @params: move_from: the board square a rook is moved from
+		 * rookColour: the colour of the rook being moved
+		 * cg: a pointer to the ChessGame object in which the castling bits
+		 * require updating
+		 */
 		void updateCastlingOptions(char const move_from[2], 
 				Colour rookColour, ChessGame* cg);
 

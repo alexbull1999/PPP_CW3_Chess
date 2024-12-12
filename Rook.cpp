@@ -25,16 +25,20 @@ void Rook::printPiece(ostream& os) {
 	}
 };
 
-//Getter for the piece name, returning a string literal representing the name of a piece
+//Getter for the piece name, returning a string literal
+//representing the name of a piece
 const char* Rook::getPieceName() const { return "Rook"; }
 
 bool Rook::isValidMove(char const move_from[2], char const move_to[2], 
 		ChessGame* cg) {
 
 	if (isValidRookMove(move_from, move_to, cg)) {
-		// at this point we know its a valid move, need to check if we need to update any of the castlingOptions
-		if ((pieceColour == Colour::WHITE && (!strcmp(move_from, "A1")|| !strcmp(move_from, "H1")))
-			|| (pieceColour == Colour::BLACK &&(!strcmp(move_from, "A8") || !strcmp(move_from, "H8")))) {
+		// at this point we know its a valid move, need to check
+		// if we need to update any of the castlingOptions
+		if ((pieceColour == Colour::WHITE && (!strcmp(move_from, "A1")
+			|| !strcmp(move_from, "H1")))
+			|| (pieceColour == Colour::BLACK &&(!strcmp(move_from, "A8")
+				|| !strcmp(move_from, "H8")))) {
 			updateCastlingOptions(move_from, pieceColour, cg);
 			}
 		return true;

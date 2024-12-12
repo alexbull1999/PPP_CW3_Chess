@@ -25,7 +25,8 @@ void Pawn::printPiece(ostream& os) {
 	}
 };
 
-//Getter for the piece name, returning a string literal representing the name of a piece
+//Getter for the piece name, returning a string literal representing
+//the name of a piece
 const char* Pawn::getPieceName() const { return "Pawn"; }
 
 
@@ -39,8 +40,8 @@ bool Pawn::isValidMove(char const move_from[2], char const move_to[2],
 	/* We can first check for Pawn captures, to handle diagonal moves */
 	ChessPiece* targetPiece = cg->getBoardPiece(move_to);
 
-	//we already check in submitMove that targetPiece cannot be of Pawn's own colour
-	//so don't need to check again here
+	//we already check in submitMove that targetPiece cannot be of Pawn's
+	//own colour so don't need to check again here
 	if (targetPiece != nullptr) {
 		//check pawn moves diagonally by only one square, in the right direction
 		if(abs(move_from[0] - move_to[0]) == 1 && 
@@ -67,10 +68,9 @@ bool Pawn::isValidMove(char const move_from[2], char const move_to[2],
 	char startingRank = (pieceColour == Colour::BLACK) ? '7' : '2';
 	if (((move_to[1] - move_from[1]) == (pawnDirection * 2)) &&
 	    move_from[1] == startingRank) {
-		/*we don't need to check the move_to square (as handled by above if branch)
-			 * but we do need to check the middle square the Pawn moves through
-			 * to make sure its empty
-		 */
+		/*we don't need to check the move_to square (as handled by above
+		 *if branch) but we do need to check the middle square the Pawn moves
+		 *through to make sure its empty */
 		char move_through_file = move_from[0];
 		char move_through_rank = move_from[1] + pawnDirection;
 		char move_through[2] = {move_through_file, move_through_rank};

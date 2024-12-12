@@ -1,6 +1,6 @@
 #include "ChessGame.h"
 #include "ChessPiece.h"
-#include "Pawn.h"
+#include <cstdlib> //for abs, for bishop/rook logic
 #include <iostream>
 
 using namespace std;
@@ -28,8 +28,6 @@ bool ChessPiece::isValidRookMove(char const move_from[2], char const move_to[2],
 	 * move_from, but not both */
 	if ((move_from[0] != move_to[0] && move_from[1] != move_to[1]) ||
 			(move_from[0] == move_to[0] && move_from[1] == move_to[1])) {
-		/* update isPieceTaken to be false first, before returning - as it is an
-		 * invalid move regardless of whether move_to contains an opposing piece */
 		return false;
 	}
 
@@ -82,11 +80,8 @@ bool ChessPiece::isValidBishopMove(char const move_from[2], char const move_to[2
 	 * are equal */
 	if (abs(move_from[0] - move_to[0]) != abs(move_from[1] - move_to[1]) ||
 			(move_from[0] == move_to[0] && move_from[1] == move_to[1])) {
-		/* before returning false we need to update isPieceTaken. Regardless of
-		 * move_to containing an enemy piece, no piece
-		 * is being taken, because it is an invalid move */
 		return false;
-			}
+	}
 
 	//Determine the vertical direction of movement
 	int rankDirection = (move_to[1] > move_from[1]) ? 1 : -1;

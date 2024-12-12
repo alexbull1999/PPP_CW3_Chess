@@ -67,12 +67,7 @@
  *   - Return type: bool
  *   - Parameters: Two char const arrays of size [2], representing move_from
  *     and move_to squares.
- *   - Functionality: A helper function to submitMove, that was previouly used
- *     to check if a move resulted in a piece being taken. I have since
- *     improved my code to do this check in a more efficient manner with an
- *     isPieceTaken reference parameter in the submitMove function; leaving
- *     capturesPiece() only used in an edge case involving multiple inheritance.
- *     (See Rook.h for more)
+ *   - Functionality: Now defunct, was used in early stages of development
  * 
  *  
  * Methods (Private):
@@ -102,12 +97,12 @@
  * - willBeInCheck:
  *   - Return type: bool
  *   - Parameters: Colour kingColour, char const move_from[2],
- *     char const move_to[2], bool isPieceTaken
+ *     char const move_to[2]
  *   - Functionality: Helper function to test if a proposed move would
- *     lead to a player being taken into or out of check. To do this, it uses 
- *     the explicitly defined copy constructor for the ChessGame class to 
- *     create a deep copy of the board, before making the proposed move, and 
- *     returning true if it does result in the player being in check.
+ *     lead to a player being taken into or out of check. To do this, it
+ *     temporarily modifies the ChessGame board, and calls the isInCheck
+ *     function on the modified board. Before returning the outcome of isInCheck
+ *     it resets the board to its original state.
  *
  * - isInCheckOrStalemate:
  *   - Return type: bool
@@ -123,14 +118,10 @@
  *   - Functionality: A helper function to update the boardState once all
  *     checks have been completed on a submitted move to ensure it is valid
  *
- * - isValidCoord:
- *	 - Return type: bool
- *	 - Parameters: char const coord[2]
- *	 - Functionality: Helper function to check a board coordinate submitted is valid
- *	   (i.e. A-H, 1-8)
+
  * */
 
-
+//defining constants used in the ChessGame
 const int MAX_FEN_LENGTH = 90;
 const int CASTLE_WHITE_KINGSIDE = 0b0001;
 const int CASTLE_WHITE_QUEENSIDE = 0b0010;
@@ -156,27 +147,54 @@ class ChessPiece;
 
 class ChessGame {
 	public:
-		//default ChessGame constructor
+		/*@brief: Constructs a Chess Game */
 		ChessGame();
 
+		/*@brief: Loads a chess board onto a chess game , via a FEN string
+		 * @params: board_string: The FEN string of max 90 chars.
+		 */
 		void loadState(char const board_string[MAX_FEN_LENGTH]);
 
+		/* @brief: Submits a chess move and checks its validity, updating
+		 * the board if valid
+		 * @params: move_from: the board square being moved from. move_to: the
+		 * board square being moved to.
+		 */
 		void submitMove(char const move_from[2], char const move_to[2]);
 
+		/* @brief: A getter function used to get a board piece on a given square
+		 * @params: boardPosition: the square you want to get the piece from
+		 */
 		ChessPiece* getBoardPiece(char const boardPosition[2]);
 
+		/* @brief: A helper function during coding to print the board */
 		void displayBoard();
 
-		//Declaring the copy constructor, which will be explicitly defined for
-		//ChessGame objects to allow deep copies
+		/* @brief: Declaring the copy constructor, for when I previously
+		 * explicitly defined it to make deep copies. No longer used in code
+		 * @params: other: another ChessGame passed as reference
+		 */
 		ChessGame(const ChessGame& other);
 
-		//ChessGame Destructor will hence also be explicitly defined (rule of 3)
+		/* @brief: The ChessGame destructor, explicitly defined in .cpp
+		 * implementation to ensure proper memory management */
 		~ChessGame();
 
-		//Assignment operator will hence also be explicitly defined (rule of 3)
+		/* @brief: Assignment operator was also explicitly defined
+		 * in accordance with the rule of 3; but like my copy constructor is
+		 * never actually used anymore in the code
+		 * @params: other: another ChessGame passed as reference
+		 */
 		ChessGame& operator=(const ChessGame& other);
 
+	private:
+
+		/*@brief: A method I used during development to work out if a move
+		 * captured a piece or not. Is no longer used at all due to code
+		 * optimisations since development.
+		 * @params: move_from, the square a piece is being moved from. move_to,
+		 * the square a piece is being moved to.
+		 */
 		bool capturesPiece(char const move_from[2], char const move_to[2]);
 		
 		//required for King and Rook classes to be able to view and update 
@@ -193,20 +211,53 @@ class ChessGame {
 		bool gameOver;
 		bool boardLoaded;
 
+		/*@brief: A helper function to check the validity of a FEN string
+		 * defensively ensuring correct input from the user.
+		 * @params: letter; the letter representing a piece in the FEN string
+		 * rank_counter: the rank where the piece is supposed to be placed on
+		 * the board
+		 * file_counter: the file where the piece is to be placed on the board
+		 */
 		bool isValidPiece(char letter, int rank_counter, int file_counter);
-		
+
+		/*@brief: a function to check if a player is in check
+		 *@params: kingColour: the colour of the player who is to be checked*/
 		bool isInCheck(Colour kingColour);
 
+		/*@brief: a function to check if a square is under attack
+		 * @params: board_square: the square in question to check
+		 * yourPieceColour: the colour of the active player
+		 */
 		bool squareUnderAttack(char const board_square[2], Colour yourPieceColour);
 
+		/*@brief: a function to check if a player will be in check when making
+		 * a theoretical move
+		 * @params: kingColour: the player's colour to check
+		 * move_from: the square the player is moving a piece from
+		 * move_to: the square the player is moving a piece to
+		 */
 		bool willBeInCheck(Colour kingColour, char const move_from[2], 
 				char const move_to[2]);
 
+		/*@brief: a function to check if a player is in check or stalemate, i.e.
+		 *is out of valid moves
+		 * @params: kingColour: the colour of the player to check
+		 */
 		bool isInCheckOrStalemate(Colour kingColour);	
 
+		/*@brief: a helper function to update a board, once a move is confirmed
+		 * as valid
+		 * @params: movedPiece: a pointer to the chess piece being moved
+		 * move_from: the board square the piece is being moved
+		 * move_to: the board square being moved to
+		 */
 		void updateBoard(ChessPiece* movedPiece, char const move_from[2], 
 				char const move_to[2]);
 
+		/*@brief: a helper function to defensively check the validity of a
+		 *coordinate being submitted in a move
+		 * @params: coord: the coordinate reference in question
+		 */
 		bool isValidCoordinate(char const coord[2]);
 };
 

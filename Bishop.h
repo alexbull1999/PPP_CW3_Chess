@@ -7,34 +7,39 @@
 /* The Bishop class represents the Bishop pieces on the chess board.
  * It does not have any attributes or methods that ChessPiece.h
  * does not already list; but overrides the virtual methods 
- * declared to ensure they are appropriate for the Bishop context. Unlike
- * the Pawn, Knight and King chess piece classes, Bishop (and Rook) use
- * virtual public inheritance from the abstract chess piece class to allow 
- * multiple inheritance with the Queen class, whilst avoiding the 
- * 'diamond problem' of the Queen doubly inheriting ChessPiece */
+ * declared to ensure they are appropriate for the Bishop context. */
 
 
 class Bishop : public ChessPiece {
 	public:
-		//Bishop Constructor
+		/*@brief: Rook Constructor
+		* @params: pieceColour, the colour of the piece being created */
 		Bishop(Colour pieceColour);
 
-		//Bishop clone method
+		//Bishop clone method, now entirely redundant and not in use
 		ChessPiece* clone() const override;
 
-		//isValidMove declaration for Bishop
-		bool isValidMove(char const move_from[2], char const move_to[2], 
+		/*@brief: a function to determine whether a submitted move is legal
+		* according to a bishop's movement rules
+		*@params: move_from, the square being moved from
+		* move_to, the square being moved to
+		* cg, an instance of a ChessGame object passed as a pointer
+		*/
+		bool isValidMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg) override;
 
-		// printPiece function I used during testing to output the piece - the
-		// function enables dynamic binding within the static ostream << operator
+		/*@brief: A helper function so displayBoard() works correctly
+		*Allows us to make use of dynamic binding within ostream overloading,
+		*so the correct piece name is printed each time from the 2d boardState
+		* array */
 		void printPiece(std::ostream&) override;
 
-		// overriding the ChessPiece virtual destructor, so memory management works
-		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
+		/* @brief: overriding the virtual ChessPiece destructor to ensure
+		* proper memory management during implicit pointer conversion */
 		~Bishop() override;
 
-		//Getter for the piece name, returning a string literal representing the name of a piece
+		/*@brief: A getter function that the queen can use to
+		* define and then access its own name */
 		const char* getPieceName() const override;
 
 

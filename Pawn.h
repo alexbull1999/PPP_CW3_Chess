@@ -10,22 +10,36 @@
 
 class Pawn : public ChessPiece {
 	public:
-		//Pawn Constructor
+
+		/*@brief: Pawn Constructor
+		* @params: pieceColour, the colour of the piece being created */
 		Pawn(Colour pieceColour);
 
-		//Pawn clone method
-		ChessPiece* clone() const override final;
+		//Pawn clone method, now entirely redundant
+		ChessPiece* clone() const override;
 
-		//isValidMove declaration for Pawn
-		bool isValidMove(char const move_from[2], char const move_to[2], 
-				ChessGame* cg) override final;
-		
-		void printPiece(std::ostream&) override final;
+		/*@brief: a function to determine whether a submitted move is legal
+		* according to a pawn's movement rules
+		*@params: move_from, the square being moved from
+		* move_to, the square being moved to
+		* cg, an instance of a ChessGame object passed as a pointer
+		*/
+		bool isValidMove(char const move_from[2], char const move_to[2],
+				ChessGame* cg) override;
 
-		//Getter for the piece name, returning a string literal representing the name of a piece
+		/*@brief: A helper function so displayBoard() works correctly
+		*Allows us to make use of dynamic binding within ostream overloading,
+		*so the correct piece name is printed each time from the 2d boardState
+		* array */
+		void printPiece(std::ostream&) override;
+
+		/*@brief: A getter function that the queen can use to
+		* define and then access its own name */
 		const char* getPieceName() const override;
 
-		~Pawn() override final;
+		/* @brief: overriding the virtual ChessPiece destructor to ensure
+		* proper memory management during implicit pointer conversion */
+		~Pawn() override;
 
 
 };
