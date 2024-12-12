@@ -209,7 +209,7 @@ int main() {
 
 	// end of loadState tests */
 
-	/* Someone trying to take their own piece and someone trying to move to the same square they're on
+	/* Someone trying to take their own piece and someone trying to move to the same square they're on./chess
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
