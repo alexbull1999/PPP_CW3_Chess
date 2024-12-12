@@ -7,8 +7,7 @@
 using namespace std;
 
 // King constructor 
-King::King(Colour pieceColour, Name pieceName) : ChessPiece(pieceColour,
-		pieceName) {};
+King::King(Colour pieceColour) : ChessPiece(pieceColour) {};
 
 //King destructor
 King::~King() {};
@@ -26,6 +25,9 @@ void King::printPiece(ostream& os) {
 		os << "K ";
 	}
 };
+
+//Getter for the piece name, returning a string literal representing the name of a piece
+const char* King::getPieceName() const { return "King"; }
 
 
 bool King::isValidMove(char const move_from[2], char const move_to[2],
@@ -102,7 +104,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		/*check that the rook hasn't been taken that you are trying to castle with 
 		 * (castlingOptions only updates if the Rook moves, not if taken) */
 		ChessPiece* cp = cg->getBoardPiece("H8");
-		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::BLACK)) {
+		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
 		//Now we need to check that the King is not in check
@@ -137,7 +139,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("A8");
-		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::BLACK)) {
+		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
 		// Now we need to check the King is not in check
@@ -171,7 +173,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("H1");
-		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::WHITE)) {
+		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::WHITE)) {
 			return false;
 		}
 		// Now we need to check the King is not in check
@@ -205,7 +207,7 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("A1");
-		if(!(cp->pieceName == Name::ROOK && cp->pieceColour == Colour::WHITE)) {
+		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::WHITE)) {
 			return false;
 		}
 		// Now we need to check the King is not in check 

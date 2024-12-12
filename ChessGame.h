@@ -143,10 +143,6 @@ const int NO_CASTLING = 0b0000;
 enum Colour {WHITE, BLACK};
 std::ostream& operator << (std::ostream&, Colour&);
 
-//declaring pieceName enum and signalling it will be overloaded for ostreams
-enum Name {PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING};
-std::ostream& operator << (std::ostream&, Name&);
-
 //declaring a MoveOutcome enum and assigning it binary values. Bitwise
 //operations improve the efficiency and elegance of our submitMove method
 enum MoveOutcome {

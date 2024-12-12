@@ -6,8 +6,7 @@
 using namespace std;
 
 // Pawn constructor
-Pawn::Pawn(Colour pieceColour, Name pieceName) : ChessPiece(pieceColour, 
-		pieceName) {};
+Pawn::Pawn(Colour pieceColour) : ChessPiece(pieceColour) {};
 
 //Pawn destructor
 Pawn::~Pawn() {};
@@ -25,6 +24,9 @@ void Pawn::printPiece(ostream& os) {
 		os << "P ";
 	}
 };
+
+//Getter for the piece name, returning a string literal representing the name of a piece
+const char* Pawn::getPieceName() const { return "Pawn"; }
 
 
 bool Pawn::isValidMove(char const move_from[2], char const move_to[2], 

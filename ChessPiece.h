@@ -37,12 +37,15 @@
 class ChessPiece {
 	public:
 		//Constructor only ever invoked by subclasses as ChessPiece is abstract
-		ChessPiece(Colour pieceColour, Name pieceName);
+		ChessPiece(Colour pieceColour);
 		
 		virtual bool isValidMove(char const move_from[2], 
 				char const move_to[2], ChessGame* cg, bool& isPieceTaken) = 0;
 
-			virtual ChessPiece* clone() const = 0;
+		virtual ChessPiece* clone() const = 0;
+
+		//pure virtual getter function that pieces will use to get their own names
+		virtual const char* getPieceName() const = 0;
 
 		//signalling overloading of the ostream operator
 		friend std::ostream& operator << (std::ostream&, ChessPiece*);
@@ -64,8 +67,8 @@ class ChessPiece {
 
 	protected:
 		Colour pieceColour;
-		Name pieceName;
-
+		bool isValidRookMove(char const move_from[2], char const move_to[2], ChessGame* cg, bool& isPieceTaken);
+		bool isValidBishopMove(char const move_from[2], char const move_to[2], ChessGame* cg, bool& isPieceTaken);
 
 };
 

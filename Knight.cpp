@@ -6,8 +6,7 @@
 using namespace std;
 
 // Knight constructor
-Knight::Knight(Colour pieceColour, Name pieceName) : ChessPiece(pieceColour, 
-		pieceName) {};
+Knight::Knight(Colour pieceColour) : ChessPiece(pieceColour) {};
 
 //Knight destructor
 Knight::~Knight() {};
@@ -25,6 +24,9 @@ void Knight::printPiece(ostream& os) {
 		os << "N ";
 	}
 };
+
+//Getter for the piece name, returning a string literal representing the name of a piece
+const char* Knight::getPieceName() const { return "Knight"; }
 
 bool Knight::isValidMove(char const move_from[2], char const move_to[2], 
 		ChessGame* cg, bool& isPieceTaken) {

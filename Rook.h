@@ -25,10 +25,10 @@
  * */
 
 
-class Rook : virtual public ChessPiece {
+class Rook : public ChessPiece {
 	public:
 		//Rook Constructor
-		Rook(Colour pieceColour, Name pieceName);
+		Rook(Colour pieceColour);
 		
 		//Rook clone method
 		ChessPiece* clone() const override;
@@ -40,6 +40,9 @@ class Rook : virtual public ChessPiece {
 		// printPiece function I used during testing to output the piece - the
 		// function enables dynamic binding within the static ostream << operator
 		void printPiece(std::ostream&) override;
+
+		//Getter for the piece name, returning a string literal representing the name of a piece
+		const char* getPieceName() const override;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)

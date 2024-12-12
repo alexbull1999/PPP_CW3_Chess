@@ -14,10 +14,10 @@
  * 'diamond problem' of the Queen doubly inheriting ChessPiece */
 
 
-class Bishop : virtual public ChessPiece {
+class Bishop : public ChessPiece {
 	public:
 		//Bishop Constructor
-		Bishop(Colour pieceColour, Name pieceName);
+		Bishop(Colour pieceColour);
 
 		//Bishop clone method
 		ChessPiece* clone() const override;
@@ -33,6 +33,10 @@ class Bishop : virtual public ChessPiece {
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)
 		~Bishop() override;
+
+		//Getter for the piece name, returning a string literal representing the name of a piece
+		const char* getPieceName() const override;
+
 
 };
 

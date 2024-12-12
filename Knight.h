@@ -11,7 +11,7 @@
 class Knight : public ChessPiece {
 	public:
 		//Knight Constructor
-		Knight(Colour pieceColour, Name pieceName);
+		Knight(Colour pieceColour);
 
 		//Knight clone method
 		ChessPiece* clone() const override final;
@@ -22,6 +22,9 @@ class Knight : public ChessPiece {
 
 		// printPiece function I used during testing to output the piece - the
 			void printPiece(std::ostream&) override final;
+
+		//Getter for the piece name, returning a string literal representing the name of a piece
+		const char* getPieceName() const override;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. through dynamic binding)

@@ -11,7 +11,7 @@
 class Pawn : public ChessPiece {
 	public:
 		//Pawn Constructor
-		Pawn(Colour pieceColour, Name pieceName);
+		Pawn(Colour pieceColour);
 
 		//Pawn clone method
 		ChessPiece* clone() const override final;
@@ -21,6 +21,9 @@ class Pawn : public ChessPiece {
 				ChessGame* cg, bool& isPieceTaken) override final; 
 		
 		void printPiece(std::ostream&) override final;
+
+		//Getter for the piece name, returning a string literal representing the name of a piece
+		const char* getPieceName() const override;
 
 		~Pawn() override final;
 

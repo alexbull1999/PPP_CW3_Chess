@@ -11,11 +11,11 @@
  * new code for its isValidMove function. */
  
 
-class Queen : public Bishop, Rook {
+class Queen : public ChessPiece {
 	public:
 		//Queen Constructor now has to pass through Bishop and Rook constructors
 		//to reach the ChessPiece constructor and initialise its pieceColour
-		Queen(Colour pieceColour, Name pieceName);
+		Queen(Colour pieceColour);
 
 		//Queen clone method
 		ChessPiece* clone() const override final;
@@ -27,6 +27,9 @@ class Queen : public Bishop, Rook {
 		// printPiece function I used during testing to output the piece - the
 		// function enables dynamic binding within the static ostream << operator
 		void printPiece(std::ostream&) override final;
+
+		//Getter for the piece name, returning a string literal representing the name of a piece
+		const char* getPieceName() const override;
 
 		// overriding the ChessPiece virtual destructor, so memory management works
 		// whilst using an array of ChessPiece pointers (i.e. dynamic binding)

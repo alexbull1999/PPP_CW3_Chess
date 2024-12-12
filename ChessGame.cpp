@@ -27,32 +27,6 @@ ostream& operator << (ostream& os, Colour& colour) {
 	return os;
 }
 
-//overloading ostream operator for name enum
-ostream& operator << (ostream& os, Name& name) {
-	switch(name)
-	{
-		case Name::PAWN:
-			os << "Pawn";
-			break;
-		case Name::ROOK:
-			os << "Rook";
-			break;
-		case Name::KNIGHT:
-			os << "Knight";
-			break;
-		case Name::BISHOP:
-			os << "Bishop";
-			break;
-		case Name::QUEEN:
-			os << "Queen";
-			break;
-		case Name::KING:
-			os << "King";
-			break;
-	}
-	return os;
-}
-
 /* Default ChessGame constructor (initializes boardState array to nullptrs).
 All other attributes initialized, but most are meaningfully assigned in
 loadState function */
@@ -178,27 +152,27 @@ bool ChessGame::isValidPiece(char letter, int rank_counter, int file_counter) {
 
 	switch (tolower(letter)) {
 		case 'p': {
-								cp = new Pawn(pieceColour, Name::PAWN);
+								cp = new Pawn(pieceColour);
 								break;
 							}
 		case 'r': {
-								cp = new Rook(pieceColour, Name::ROOK);
+								cp = new Rook(pieceColour);
 								break;
 							}
 		case 'n': {
-								cp = new Knight(pieceColour, Name::KNIGHT);
+								cp = new Knight(pieceColour);
 								break;
 							}
 		case 'b': {
-								cp = new Bishop(pieceColour, Name::BISHOP);
+								cp = new Bishop(pieceColour);
 								break;
 							}
 		case 'q': {
-								cp = new Queen(pieceColour, Name::QUEEN);
+								cp = new Queen(pieceColour);
 								break;
 							}
 		case 'k': {
-								cp = new King(pieceColour, Name::KING);
+								cp = new King(pieceColour);
 								break;
 							}
 		default:
@@ -261,7 +235,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	// check to not dereference a nullptr
 	if (takenPiece != nullptr) { 
 		if (movedPiece->pieceColour == takenPiece->pieceColour) {
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
+			cout << whoseTurn << "'s " << movedPiece->getPieceName() << " cannot move to "
 				<< move_to << "!\n";
 			return;
 		}
@@ -278,7 +252,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	 * into check, so we need to check this as well */
 	try {
 		if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to "
+			cout << whoseTurn << "'s " << movedPiece->getPieceName() << " cannot move to "
 			<< move_to << "!\n";
 			return;
 		}
@@ -297,7 +271,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	switch(outcome) {
 		case NOT_VALID_MOVE:
 		{
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " cannot move to " 
+			cout << whoseTurn << "'s " << movedPiece->getPieceName() << " cannot move to "
 				<< move_to << "!\n";
 			return;			
 		}
@@ -306,9 +280,9 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		 * since the captureFlag indicates by necessity that takenPiece is not null */
 		case VALID_WITH_CAPTURE: 
 		{
-			cout << whoseTurn << "'s " << movedPiece->pieceName << " moves from " <<
+			cout << whoseTurn << "'s " << movedPiece->getPieceName() << " moves from " <<
 				move_from << " to " << move_to << " taking " << takenPiece->pieceColour
-				<< "'s " << takenPiece->pieceName << "\n";
+				<< "'s " << takenPiece->getPieceName() << "\n";
 			//delete the taken piece from the board
 			delete takenPiece;
 			takenPiece = nullptr;
@@ -320,7 +294,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		
 		case VALID_NO_CAPTURE:
 		{
-			cout << whoseTurn << "'s " <<  movedPiece->pieceName << " moves from " <<
+			cout << whoseTurn << "'s " <<  movedPiece->getPieceName() << " moves from " <<
 				move_from << " to " << move_to << endl;
 		}
 	}
@@ -480,7 +454,7 @@ bool ChessGame::isInCheck(Colour kingColour) {
 					continue;
 				}
 				ChessPiece* cp = boardState[rank][file];
-				if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
+				if (dynamic_cast<King*>(cp) && cp->pieceColour == kingColour) {
 					kingPosition[0] = file + 'A';
 					kingPosition[1] = rank + '1';
 					//once the king position found, see if it is under attack
