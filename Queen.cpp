@@ -31,7 +31,7 @@ void Queen::printPiece(ostream& os) {
 const char* Queen::getPieceName() const { return "Queen"; }
 
 bool Queen::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg, bool& isPieceTaken) {
+		ChessGame* cg) {
 	/*there should never be conflicts here, as from the Queen's position
 	 * a move that is valid for a Bishop would not be valid for a Rook
 	 * and vice-versa due to diagonal vs vertical/horizontal movement.
@@ -39,6 +39,6 @@ bool Queen::isValidMove(char const move_from[2], char const move_to[2],
 	 * as a temp variable, as if isValidBishopMove is false, it will set it
 	 * to false, even if it is true and a valid Rook Move
 	 */
-	return isValidBishopMove(move_from, move_to, cg, isPieceTaken) ||
-		isValidRookMove(move_from, move_to, cg, isPieceTaken);
+	return isValidBishopMove(move_from, move_to, cg) ||
+		isValidRookMove(move_from, move_to, cg);
 }

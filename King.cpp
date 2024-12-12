@@ -31,7 +31,7 @@ const char* King::getPieceName() const { return "King"; }
 
 
 bool King::isValidMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg, bool& isPieceTaken) {
+		ChessGame* cg) {
 	/* first check if the king is castling as this needs to be routed through
 	 * the checkForCastlingMove helper function */
 	if(checkForCastlingMove(move_from, move_to, cg)) {
@@ -50,7 +50,6 @@ bool King::isValidMove(char const move_from[2], char const move_to[2],
 		/* update isPieceTaken before returning false; as even if there was
 		 * an opponent piece in the move_to square, it won't be taken due to
 		 * invalid move*/
-		isPieceTaken = false;
 		return false;
 	}
 	// else its a valid move, so we can update castling options, and return true

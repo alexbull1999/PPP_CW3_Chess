@@ -40,7 +40,7 @@ class ChessPiece {
 		ChessPiece(Colour pieceColour);
 		
 		virtual bool isValidMove(char const move_from[2], 
-				char const move_to[2], ChessGame* cg, bool& isPieceTaken) = 0;
+				char const move_to[2], ChessGame* cg) = 0;
 
 		virtual ChessPiece* clone() const = 0;
 
@@ -67,8 +67,8 @@ class ChessPiece {
 
 	protected:
 		Colour pieceColour;
-		bool isValidRookMove(char const move_from[2], char const move_to[2], ChessGame* cg, bool& isPieceTaken);
-		bool isValidBishopMove(char const move_from[2], char const move_to[2], ChessGame* cg, bool& isPieceTaken);
+		bool isValidRookMove(char const move_from[2], char const move_to[2], ChessGame* cg);
+		bool isValidBishopMove(char const move_from[2], char const move_to[2], ChessGame* cg);
 
 };
 

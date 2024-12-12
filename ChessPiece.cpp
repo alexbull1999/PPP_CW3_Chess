@@ -23,14 +23,13 @@ ostream& operator << (std::ostream& os, ChessPiece* cp) {
 }
 
 bool ChessPiece::isValidRookMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg, bool& isPieceTaken) {
+		ChessGame* cg) {
 	/* check first if either the rank or the file of move_to is the same as
 	 * move_from, but not both */
 	if ((move_from[0] != move_to[0] && move_from[1] != move_to[1]) ||
 			(move_from[0] == move_to[0] && move_from[1] == move_to[1])) {
 		/* update isPieceTaken to be false first, before returning - as it is an
 		 * invalid move regardless of whether move_to contains an opposing piece */
-		isPieceTaken = false;
 		return false;
 	}
 
@@ -67,22 +66,17 @@ bool ChessPiece::isValidRookMove(char const move_from[2], char const move_to[2],
 	while (checkSpace[0] != move_to[0] || checkSpace[1] != move_to[1]) {
 		if (cg->getBoardPiece(checkSpace)) {
 			//invalid move as it cannot cross a square containing a piece
-			isPieceTaken = false;
 			return false;
 		}
 		checkSpace[0] += fileDirection;
 		checkSpace[1] += rankDirection;
 	}
 
-	if (cg->capturesPiece(move_from, move_to)) {
-		isPieceTaken = true;
-	}
-
 	return true;
 }
 
 bool ChessPiece::isValidBishopMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg, bool& isPieceTaken) {
+		ChessGame* cg) {
 	/* bishops can only move diagonally, so a first way to check if a move is
 	 * valid is to see if the number of squares moved vertically and horizontally
 	 * are equal */
@@ -91,7 +85,6 @@ bool ChessPiece::isValidBishopMove(char const move_from[2], char const move_to[2
 		/* before returning false we need to update isPieceTaken. Regardless of
 		 * move_to containing an enemy piece, no piece
 		 * is being taken, because it is an invalid move */
-		isPieceTaken = false;
 		return false;
 			}
 
@@ -112,7 +105,6 @@ bool ChessPiece::isValidBishopMove(char const move_from[2], char const move_to[2
 		//cg->getBoardPiece is only true if there is a piece (i.e. not a nullptr)
 		if (cg->getBoardPiece(checkSpace)) {
 			//Before returning false we need to update isPieceTaken to false
-			isPieceTaken = false;
 			return false;
 		}
 			}

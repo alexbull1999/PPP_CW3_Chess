@@ -218,7 +218,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 		return;
 	}
 	//if there is a piece, check it matches the colour of whose turn it is
-	else if(movedPiece->pieceColour != whoseTurn) {
+	 if(movedPiece->pieceColour != whoseTurn) {
 		cout << "It is not " << movedPiece->pieceColour << "'s turn to move!\n";
 		return;
 	}
@@ -245,10 +245,10 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	/* We now check the validity of the move according to the movement
 	 * rules of each piece and store the result in validMove. Note: 
 	 * if a move is invalid, the isPieceTaken bool is also set back to false */
-	bool validMove = movedPiece->isValidMove(move_from, move_to, this, 
-			isPieceTaken); 
+	bool validMove = movedPiece->isValidMove(move_from, move_to, this);
+	if (!validMove) { isPieceTaken = false; } //regardless of if there is a piece in move_to
 
-	/* Even if a move is valid by piece movement rukes, you can't move yourself 
+	/* Even if a move is valid by piece movement rules, you can't move yourself
 	 * into check, so we need to check this as well */
 	try {
 		if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
@@ -264,8 +264,8 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	/*Update the flags below depending on the outcomes of the isValidMove and 
 	 * isPieceTaken bools. This allows us to use the MoveOutcome enum to 
 	 * determine what to do next */
-	int validFlag = validMove ? 0b01 : 0b00;
-	int captureFlag = isPieceTaken ? 0b10 : 0b00;
+	int validFlag = validMove ? 0b01 : 0b00; //0b01 indicates a valid move
+	int captureFlag = isPieceTaken ? 0b10 : 0b00; //0b10 indicates a move that takes a piece
 	MoveOutcome outcome = static_cast<MoveOutcome>(validFlag | captureFlag);
 	
 	switch(outcome) {
@@ -488,10 +488,7 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 				char letterFile = file + 'A';
 				char letterRank = rank + '1';
 				char cpPosition[2] = {letterFile, letterRank};
-				//by default isPieceTaken is true here, as we are checking if the
-				//square is under attack from an enemy piece.
-				bool isPieceTaken = true;
-				if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
+				if (cp->isValidMove(cpPosition, board_square, this)) {
 					return true;
 				}
 				oppoPieceCount--;
@@ -564,7 +561,6 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 						char move_to[2] = {moveFile, moveRank};
 
 						//check if the move would be valid by piece movement rules
-						//Copying the logic of submitMove
 
 						bool isPieceTaken = false;
 						ChessPiece* takenPiece = getBoardPiece(move_to);
@@ -574,8 +570,7 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 							}
 							isPieceTaken = true;
 						}
-						if (friendlyPiece-> isValidMove(move_from, move_to, this,
-						                                isPieceTaken)) {
+						if (friendlyPiece-> isValidMove(move_from, move_to, this)) {
 							//if valid, check if the move frees the king from check
 							if (!willBeInCheck(kingColour, move_from, move_to,
 							                   isPieceTaken)) {

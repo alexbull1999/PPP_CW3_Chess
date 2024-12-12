@@ -18,7 +18,7 @@ class Knight : public ChessPiece {
 
 		//isValidMove declaration for Knight
 		bool isValidMove(char const move_from[2], char const move_to[2],
-				ChessGame* cg, bool& isPieceTaken) override final;
+				ChessGame* cg) override final;
 
 		// printPiece function I used during testing to output the piece - the
 			void printPiece(std::ostream&) override final;

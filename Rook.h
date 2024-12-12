@@ -35,7 +35,7 @@ class Rook : public ChessPiece {
 
 		//isValidMove declaration for Rook
 		bool isValidMove(char const move_from[2], char const move_to[2], 
-				ChessGame* cg, bool& isPieceTaken) override;
+				ChessGame* cg) override;
 
 		// printPiece function I used during testing to output the piece - the
 		// function enables dynamic binding within the static ostream << operator

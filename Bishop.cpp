@@ -29,8 +29,8 @@ void Bishop::printPiece(ostream& os) {
 const char* Bishop::getPieceName() const { return "Bishop"; }
 
 bool Bishop::isValidMove(char const move_from[2], char const move_to[2],
-		ChessGame* cg, bool& isPieceTaken) {
-	return isValidBishopMove(move_from, move_to, cg, isPieceTaken);
+		ChessGame* cg) {
+	return isValidBishopMove(move_from, move_to, cg);
 }
 
 

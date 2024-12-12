@@ -29,7 +29,7 @@ void Knight::printPiece(ostream& os) {
 const char* Knight::getPieceName() const { return "Knight"; }
 
 bool Knight::isValidMove(char const move_from[2], char const move_to[2], 
-		ChessGame* cg, bool& isPieceTaken) {
+		ChessGame* cg) {
 	//check to make sure that either it is moving 2 squares horizontally and 1
 	//square vertically, or vice versa (no other combo is legal)
 	if (!(((abs(move_from[0] - move_to[0]) == 2) && 
@@ -40,7 +40,6 @@ bool Knight::isValidMove(char const move_from[2], char const move_to[2],
 		/* If the above is not the case, update the isPieceTaken bool, to indicate 
 		 * false - as even if there was an enemy piece in the move_to square, this 
 		 * is an invalid move so no piece can be taken */
-		isPieceTaken = false;
 		return false;
 	}
 	// else we can return true, and let the isPieceTaken marker that has been
