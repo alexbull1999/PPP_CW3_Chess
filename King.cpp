@@ -103,6 +103,9 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		/*check that the rook hasn't been taken that you are trying to castle with 
 		 * (castlingOptions only updates if the Rook moves, not if taken) */
 		ChessPiece* cp = cg->getBoardPiece("H8");
+		if (!cp) {
+			return false; //i.e. no rook there, so we avoid dereferencing nullptr
+		}
 		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
@@ -138,6 +141,9 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("A8");
+		if (!cp) {
+			return false; //i.e. no rook there, so we avoid dereferencing nullptr
+		}
 		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::BLACK)) {
 			return false;
 		}
@@ -172,6 +178,9 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("H1");
+		if (!cp) {
+			return false; //i.e. no rook there, so we avoid dereferencing nullptr
+		}
 		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::WHITE)) {
 			return false;
 		}
@@ -199,18 +208,25 @@ bool King::checkForCastlingMove(char const move_from[2], char const move_to[2],
 	
 	//option 4 white castling queenside
 	if(!strcmp(move_to, "C1")) {
-		if (!(cg->castlingOptions & CASTLE_WHITE_KINGSIDE)) {
+		if (!(cg->castlingOptions & CASTLE_WHITE_QUEENSIDE)) {
+			cout << "Queenside bit unavailable\n";
 			return false; // as white queenside castling is unavailable
 		}
 		/* check that the rook hasn't been taken that you are trying to
 		 * castle with (castlingOptions only updates if the Rook
 		 * moves, not if its taken) */
 		ChessPiece* cp = cg->getBoardPiece("A1");
+		if (!cp) {
+			cout << "No piece in A1\n";
+			return false; //i.e. no rook there, so we avoid dereferencing nullptr
+		}
 		if(!(!strcmp(cp->getPieceName(), "Rook") && cp->pieceColour == Colour::WHITE)) {
+			cout << "STRCMP fail\n";
 			return false;
 		}
 		// Now we need to check the King is not in check 
 		if (cg->squareUnderAttack("E1", Colour::WHITE)) {
+			cout << "King under attack\n";
 			return false;
 		}
 		/* Also check that none of the squares the king will pass through will be 

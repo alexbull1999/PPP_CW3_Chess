@@ -200,7 +200,7 @@ class ChessGame {
 		bool squareUnderAttack(char const board_square[2], Colour yourPieceColour);
 
 		bool willBeInCheck(Colour kingColour, char const move_from[2], 
-				char const move_to[2], bool isPieceTaken);
+				char const move_to[2]);
 
 		bool isInCheckOrStalemate(Colour kingColour);	
 

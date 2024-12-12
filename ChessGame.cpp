@@ -251,7 +251,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 	/* Even if a move is valid by piece movement rules, you can't move yourself
 	 * into check, so we need to check this as well */
 	try {
-		if (validMove && willBeInCheck(whoseTurn, move_from, move_to, isPieceTaken)) {
+		if (validMove && willBeInCheck(whoseTurn, move_from, move_to)) {
 			cout << whoseTurn << "'s " << movedPiece->getPieceName() << " cannot move to "
 			<< move_to << "!\n";
 			return;
@@ -508,31 +508,34 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 /* Helper function to test if a proposed move that is valid by the rules of 
  * Chess takes a King into or out of Check */
 bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2], 
-		 char const move_to[2], bool isPieceTaken) {
-	// Create a deep copy of the current board
-	ChessGame copiedGame(*this);
+		 char const move_to[2]) {
 
-	ChessPiece* movedPiece = copiedGame.getBoardPiece(move_from);
+	// Backup the current state of the squares concerning the move
+	ChessPiece* movedPiece = getBoardPiece(move_from);
+	ChessPiece* takenPiece = getBoardPiece(move_to);
 
-	//Commit the proposed move to the copied board
-	//Dealing with possibility of capturing a piece or moving to an 
-	//empty square
-	if (isPieceTaken) {	
-		ChessPiece* takenPiece = copiedGame.getBoardPiece(move_to);
-		if (takenPiece != nullptr) {
-			delete takenPiece;
-			takenPiece = nullptr;
-		}
-		movedPiece->pieceColour == Colour::BLACK ? copiedGame.whiteCount-- : copiedGame.blackCount--;		
+	// Temporarily modify the board
+	boardState[move_to[1] - '1'][move_to[0] - 'A'] = movedPiece;
+	boardState[move_from[1] - '1'][move_from[0] - 'A'] = nullptr;
+
+	// Adjust piece counts temporarily if a piece is captured
+	if (takenPiece != nullptr) {
+		takenPiece->pieceColour == Colour::BLACK ? blackCount-- : whiteCount--;
 	}
 
-	// Move the piece being moved to the new position on the copied board
-	copiedGame.updateBoard(movedPiece, move_from, move_to);
-	if (copiedGame.isInCheck(kingColour)) {
-		//Defined destructor automatically destroy copiedGame upon returning
-		return true;
+	bool inCheck = isInCheck(kingColour);
+
+	// Reset board state to its original state, regardless of result
+	boardState[move_from[1] - '1'][move_from[0] - 'A'] = movedPiece;
+	boardState[move_to[1] - '1'][move_to[0] - 'A'] = takenPiece;
+
+
+	// Restore piece counts to their original state
+	if (takenPiece != nullptr) {
+		takenPiece->pieceColour == Colour::BLACK ? blackCount++ : whiteCount++;
 	}
-	return false;
+
+	return inCheck;
 }
 
 
@@ -562,18 +565,15 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 
 						//check if the move would be valid by piece movement rules
 
-						bool isPieceTaken = false;
 						ChessPiece* takenPiece = getBoardPiece(move_to);
 						if (takenPiece != nullptr) {
 							if (kingColour == takenPiece->pieceColour) {
 								continue; //invalid move
 							}
-							isPieceTaken = true;
 						}
 						if (friendlyPiece-> isValidMove(move_from, move_to, this)) {
 							//if valid, check if the move frees the king from check
-							if (!willBeInCheck(kingColour, move_from, move_to,
-							                   isPieceTaken)) {
+							if (!willBeInCheck(kingColour, move_from, move_to)) {
 								return false; //i.e. not in checkmate
 							}
 						}

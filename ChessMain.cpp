@@ -77,8 +77,9 @@ int main() {
 	cg.submitMove("D3", "G6");
 	cout << '\n';
 
+
 	/* Tests I wrote to check my try/catch exceptions deal gracefully with a state where no Kings are loaded
-	 * on a board, or just one King is loaded */
+	 * on a board, or just one King is loaded
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cout << '\n';
@@ -96,16 +97,16 @@ int main() {
 	cg.displayBoard();
 	cout << '\n';
 
-	////////End of exceptions tests
+	////////End of exceptions tests */
 
-	/* Tests for invalid board coordinates */
+	/* Tests for invalid board coordinates
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cg.submitMove("K8", "B9");
 
-	//end of tests
+	//end of tests */
 
-	/* Testing castling kingside for black/white, then commenting out and testing castling queenside */
+	/* Testing castling kingside for black/white, then commenting out and testing castling queenside
 
 	cg.loadState("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -120,7 +121,7 @@ int main() {
 
 	// end of castling tests */
 
-	/* Testing castling when it is invalid i.e. the castling bits have been disabled */
+	/* Testing castling when it is invalid i.e. the castling bits have been disabled
 
 	cg.loadState("r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -136,8 +137,19 @@ int main() {
 
 	// end of tests */
 
+	/* Testing castling through check or when in check
+	cg.loadState("r3k2r/8/4Q3/8/8/7q/8/R3K2R w KQkq - 0 1");
+	cout << '\n';
+	cg.displayBoard();
+	cout << '\n';
+	cg.submitMove("E1", "G1"); //should be invalid, castling through check
+	cg.submitMove("E1", "C1"); //should be valid, as white king not in check
+	cg.submitMove("E8", "G8"); //should be invalid castling in check
 
-	/* Testing stalemate behaving as expected and someone trying to play a move when in stalemate */
+	// ending castling tests */
+
+
+	/* Testing stalemate behaving as expected and someone trying to play a move when in stalemate
 
 	cg.loadState("7k/8/6K1/8/8/8/8/5Q2 w - - 0 1");
 	cout << '\n';
@@ -147,9 +159,9 @@ int main() {
 	cg.displayBoard();
 	cg.submitMove("H8", "G8");
 
-	// end of stalemate tests
+	// end of stalemate tests */
 
-	/* Illegal move tests */
+	/* Illegal move tests
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	cout << '\n';
@@ -163,9 +175,9 @@ int main() {
 	cg.submitMove("C1", "B2"); //valid bishop move
 	cg.submitMove("C8", "C7"); //invalid bishop move, cannot move straight forward
 
-	// end of illegal moves tests
+	// end of illegal moves tests */
 
-	/* Check and Checkmate Tests, and someone trying to play a move in checkmate */
+	/* Check and Checkmate Tests, and someone trying to play a move in checkmate
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K4 b KQkq - 0 2");
 	cout << '\n';
@@ -199,17 +211,17 @@ int main() {
 	cg.submitMove("C3", "D1"); //valid but not in check
 	cg.displayBoard();
 
-	// end of check and checkmate tests
+	// end of check and checkmate tests */
 
-	/* Someone starting a new game and submitting a move without calling loadState */
+	/* Someone starting a new game and submitting a move without calling loadState
 
 	ChessGame cg2;
 	cg2.submitMove("E2", "E4");
 	cg2.submitMove("E3", "E5");
 
-	// end of loadState tests
+	// end of loadState tests */
 
-	/* Someone trying to take their own piece and someone trying to move to the same square they're on */
+	/* Someone trying to take their own piece and someone trying to move to the same square they're on
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
@@ -223,11 +235,11 @@ int main() {
 	cg.submitMove("D1", "D1"); // invalid queen
 	cg.submitMove("E1", "E1"); //invalid king
 
-	// end of tests for invalid moves
+	// end of tests for invalid moves */
 
 
 
-	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov - (includes castling) and check */
+	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov - (includes castling) and check
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
@@ -299,7 +311,7 @@ int main() {
 	cg.submitMove("A7", "A6");
 	cg.displayBoard();
 
-	// End of Fischer vs Kholmov test
+	// End of Fischer vs Kholmov test */
 
 
 	return 0;
