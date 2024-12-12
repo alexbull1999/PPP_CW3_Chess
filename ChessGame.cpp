@@ -138,7 +138,7 @@ void ChessGame::loadState(char const board_string[MAX_FEN_LENGTH]) {
 			boardLoaded = true;
 			return;
 		}
-		else if (board_string[FENCounter] == 'K') {
+		if (board_string[FENCounter] == 'K') {
 			//White can castle kingside, stored as bit 0 of castlingOptions
 			castlingOptions |= CASTLE_WHITE_KINGSIDE;
 		}
@@ -211,11 +211,9 @@ bool ChessGame::isValidPiece(char letter, int rank_counter, int file_counter) {
 	if (cp == nullptr) {
 		return false;
 	}
-	else {
-		boardState[rank_counter][file_counter] = cp;
-		pieceColour == Colour::BLACK ? blackCount++ : whiteCount++;
-		return true;
-	}
+	boardState[rank_counter][file_counter] = cp;
+	pieceColour == Colour::BLACK ? blackCount++ : whiteCount++;
+	return true;
 }
 
 
@@ -267,9 +265,7 @@ void ChessGame::submitMove(char const move_from[2], char const move_to[2]) {
 				<< move_to << "!\n";
 			return;
 		}
-		else {
-			isPieceTaken = true;
-		}
+		isPieceTaken = true;
 	}
 	
 	/* We now check the validity of the move according to the movement
@@ -483,14 +479,12 @@ bool ChessGame::isInCheck(Colour kingColour) {
 				if (boardState[rank][file] == nullptr) {
 					continue;
 				}
-				else {
-					ChessPiece* cp = boardState[rank][file];
-					if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
-						kingPosition[0] = file + 'A';
-						kingPosition[1] = rank + '1';
-						//once the king position found, see if it is under attack
-						return squareUnderAttack(kingPosition, kingColour);
-					}
+				ChessPiece* cp = boardState[rank][file];
+				if (cp->pieceName == Name::KING && cp->pieceColour == kingColour) {
+					kingPosition[0] = file + 'A';
+					kingPosition[1] = rank + '1';
+					//once the king position found, see if it is under attack
+					return squareUnderAttack(kingPosition, kingColour);
 				}
 			}
 		}
@@ -515,25 +509,21 @@ bool ChessGame::squareUnderAttack(char const board_square[2],
 			if (boardState[rank][file] == nullptr) {
 				continue;
 			}
-			else {
-				ChessPiece* cp = boardState[rank][file];
-				if (cp->pieceColour != yourPieceColour) {
-					char letterFile = file + 'A';
-					char letterRank = rank + '1';
-					char cpPosition[2] = {letterFile, letterRank};
-					//by default isPieceTaken is true here, as we are checking if the
-					//square is under attack from an enemy piece.
-					bool isPieceTaken = true;
-					if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
-						return true;
-					}
-					else {
-						oppoPieceCount--;
-						// use of oppoPieceCount helps avoid iterating through entire board
-						if (oppoPieceCount == 0) {
-							return false;
-						}
-					}
+			ChessPiece* cp = boardState[rank][file];
+			if (cp->pieceColour != yourPieceColour) {
+				char letterFile = file + 'A';
+				char letterRank = rank + '1';
+				char cpPosition[2] = {letterFile, letterRank};
+				//by default isPieceTaken is true here, as we are checking if the
+				//square is under attack from an enemy piece.
+				bool isPieceTaken = true;
+				if (cp->isValidMove(cpPosition, board_square, this, isPieceTaken)) {
+					return true;
+				}
+				oppoPieceCount--;
+				// use of oppoPieceCount helps avoid iterating through entire board
+				if (oppoPieceCount == 0) {
+					return false;
 				}
 			}
 		}
@@ -571,9 +561,7 @@ bool ChessGame::willBeInCheck(Colour kingColour, char const move_from[2],
 		//Defined destructor automatically destroy copiedGame upon returning
 		return true;
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 
@@ -589,8 +577,7 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 			if (boardState[rank][file] == nullptr) {
 				continue;
 			}
-
-			else if (boardState[rank][file]->pieceColour == kingColour) {
+			if (boardState[rank][file]->pieceColour == kingColour) {
 				char letterRank = rank + '1';
 				char letterFile = file + 'A';
 				char move_from[2] = {letterFile, letterRank};
@@ -607,19 +594,17 @@ bool ChessGame::isInCheckOrStalemate(Colour kingColour) {
 
 						bool isPieceTaken = false;
 						ChessPiece* takenPiece = getBoardPiece(move_to);
-						if (takenPiece != nullptr) { 
+						if (takenPiece != nullptr) {
 							if (kingColour == takenPiece->pieceColour) {
 								continue; //invalid move
 							}
-							else {
-								isPieceTaken = true;
-							}
+							isPieceTaken = true;
 						}
-						if (friendlyPiece-> isValidMove(move_from, move_to, this, 
-									isPieceTaken)) {
+						if (friendlyPiece-> isValidMove(move_from, move_to, this,
+						                                isPieceTaken)) {
 							//if valid, check if the move frees the king from check
-							if (!willBeInCheck(kingColour, move_from, move_to, 
-										isPieceTaken)) {
+							if (!willBeInCheck(kingColour, move_from, move_to,
+							                   isPieceTaken)) {
 								return false; //i.e. not in checkmate
 							}
 						}

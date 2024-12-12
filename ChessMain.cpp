@@ -111,8 +111,8 @@ int main() {
 	cout << '\n';
 	cg.displayBoard();
 	cout << '\n';
-	cg.submitMove("E1", "G1");
-	cg.submitMove("E8", "G8");
+	//cg.submitMove("E1", "G1");
+	//cg.submitMove("E8", "G8");
 	cg.submitMove("E1", "C1");
 	cg.submitMove("E8", "C8");
 	cg.displayBoard();
@@ -209,7 +209,7 @@ int main() {
 
 	// end of loadState tests */
 
-	/* Someone trying to take their own piece and someone trying to move to the same square they're on./chess
+	/* Someone trying to take their own piece and someone trying to move to the same square they're on
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
