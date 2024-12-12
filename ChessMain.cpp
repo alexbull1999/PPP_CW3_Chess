@@ -79,7 +79,7 @@ int main() {
 
 
 	/* Tests I wrote to check my try/catch exceptions deal gracefully with a
-	 * state where no Kings are loaded on a board, or just one King is loaded */
+	 * state where no Kings are loaded on a board, or just one King is loaded
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cout << '\n';
@@ -99,7 +99,7 @@ int main() {
 
 	////////End of exceptions tests */
 
-	/* Tests for invalid board coordinates */
+	/* Tests for invalid board coordinates
 
 	cg.loadState("8/8/8/3p4/2P5/8/8/8 w - - 0 1");
 	cg.submitMove("K8", "B9");
@@ -107,7 +107,7 @@ int main() {
 	//end of tests */
 
 	/* Testing castling kingside for black/white, then commenting out
-	 * and testing castling queenside */
+	 * and testing castling queenside
 
 	cg.loadState("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -123,7 +123,7 @@ int main() {
 	// end of castling tests */
 
 	/* Testing castling when it is invalid i.e. the castling
-	 * bits have been disabled */
+	 * bits have been disabled
 
 	cg.loadState("r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -140,7 +140,7 @@ int main() {
 	// end of tests */
 
 	/* Testing castling when it is invalid i.e. the castling
-	 * bits have been disabled this time by rooks */
+	 * bits have been disabled this time by rooks
 
 	cg.loadState("r3k2r/1ppp1ppp/8/8/8/8/PPPP1PP1/R3K2R w KQkq - 0 1");
 	cout << '\n';
@@ -156,7 +156,7 @@ int main() {
 
 	// end of tests */
 
-	/* Testing castling through check or when in check */
+	/* Testing castling through check or when in check
 	cg.loadState("r3k2r/8/4Q3/8/8/7q/8/R3K2R w KQkq - 0 1");
 	cout << '\n';
 	cg.displayBoard();
@@ -169,7 +169,7 @@ int main() {
 
 
 	/* Testing stalemate behaving as expected and someone trying to
-	 * play a move when in stalemate */
+	 * play a move when in stalemate
 
 	cg.loadState("7k/8/6K1/8/8/8/8/5Q2 w - - 0 1");
 	cout << '\n';
@@ -181,7 +181,7 @@ int main() {
 
 	// end of stalemate tests */
 
-	/* Illegal move tests */
+	/* Illegal move tests
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	cout << '\n';
@@ -197,7 +197,7 @@ int main() {
 
 	// end of illegal moves tests */
 
-	/* Check and Checkmate Tests, and someone trying to play a move in checkmate */
+	/* Check and Checkmate Tests, and someone trying to play a move in checkmate
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/4q3/PPPPPPPP/3K4 b KQkq - 0 2");
 	cout << '\n';
@@ -233,7 +233,7 @@ int main() {
 
 	// end of check and checkmate tests */
 
-	/* Someone starting a new game, submitting a move without calling loadState */
+	/* Someone starting a new game, submitting a move without calling loadState
 
 	ChessGame cg2;
 	cg2.submitMove("E2", "E4");
@@ -242,7 +242,7 @@ int main() {
 	// end of loadState tests */
 
 	/* Someone trying to take their own piece
-	 * and someone trying to move to the same square they're on */
+	 * and someone trying to move to the same square they're on
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';
@@ -261,7 +261,7 @@ int main() {
 
 
 	/* Testing a long game - Bobby Fischer vs Ratmir Kholmov -
-	 * (includes castling) and check */
+	 * (includes castling) and check
 
 	cg.loadState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 	cout << '\n';

@@ -397,7 +397,7 @@ ChessGame::ChessGame(const ChessGame& other) {
 	castlingOptions = other.castlingOptions;
 	gameOver = other.gameOver;
 	boardLoaded = other.boardLoaded;
-} *.
+} */
 
 /* Defining the destructor so we clean up heap allocated memory properly */
 ChessGame::~ChessGame() {
