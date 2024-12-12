@@ -164,6 +164,7 @@ class ChessGame {
 
 		/* @brief: A getter function used to get a board piece on a given square
 		 * @params: boardPosition: the square you want to get the piece from
+		 * @returns: a pointer to the board piece found
 		 */
 		ChessPiece* getBoardPiece(char const boardPosition[2]);
 
@@ -173,6 +174,7 @@ class ChessGame {
 		/* @brief: Declaring the copy constructor, for when I previously
 		 * explicitly defined it to make deep copies. No longer used in code
 		 * @params: other: another ChessGame passed as reference
+		 * @returns: a new ChessGame object identical to the copy
 		 */
 		ChessGame(const ChessGame& other);
 
@@ -184,6 +186,7 @@ class ChessGame {
 		 * in accordance with the rule of 3; but like my copy constructor is
 		 * never actually used anymore in the code
 		 * @params: other: another ChessGame passed as reference
+		 * @returns: a new ChessGame object equal to the copy
 		 */
 		ChessGame& operator=(const ChessGame& other);
 
@@ -194,6 +197,7 @@ class ChessGame {
 		 * optimisations since development.
 		 * @params: move_from, the square a piece is being moved from. move_to,
 		 * the square a piece is being moved to.
+		 * @returns: a bool, true if a picece is captured
 		 */
 		bool capturesPiece(char const move_from[2], char const move_to[2]);
 		
@@ -217,16 +221,20 @@ class ChessGame {
 		 * rank_counter: the rank where the piece is supposed to be placed on
 		 * the board
 		 * file_counter: the file where the piece is to be placed on the board
+		 * @returns: a bool, true if a valid piece has been detected
 		 */
 		bool isValidPiece(char letter, int rank_counter, int file_counter);
 
-		/*@brief: a function to check if a player is in check
-		 *@params: kingColour: the colour of the player who is to be checked*/
+		/* @brief: a function to check if a player is in check
+		 * @params: kingColour: the colour of the player who is to be checked
+		 * @returns: a bool, true if the player is in check
+		 */
 		bool isInCheck(Colour kingColour);
 
 		/*@brief: a function to check if a square is under attack
 		 * @params: board_square: the square in question to check
 		 * yourPieceColour: the colour of the active player
+		 * @returns: a bool, true if the board square is in an enemy line of sight
 		 */
 		bool squareUnderAttack(char const board_square[2], Colour yourPieceColour);
 
@@ -242,6 +250,7 @@ class ChessGame {
 		/*@brief: a function to check if a player is in check or stalemate, i.e.
 		 *is out of valid moves
 		 * @params: kingColour: the colour of the player to check
+		 * @returns: a bool, true if the player is in checkmate or stalemate
 		 */
 		bool isInCheckOrStalemate(Colour kingColour);	
 
@@ -257,6 +266,7 @@ class ChessGame {
 		/*@brief: a helper function to defensively check the validity of a
 		 *coordinate being submitted in a move
 		 * @params: coord: the coordinate reference in question
+		 * @returns: a bool, true if it is a valid coordinate
 		 */
 		bool isValidCoordinate(char const coord[2]);
 };

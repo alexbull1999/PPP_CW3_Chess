@@ -13,7 +13,8 @@
 class Bishop : public ChessPiece {
 	public:
 		/*@brief: Rook Constructor
-		* @params: pieceColour, the colour of the piece being created */
+		* @params: pieceColour, the colour of the piece being created
+		* @returns: a Bishop object */
 		Bishop(Colour pieceColour);
 
 		//Bishop clone method, now entirely redundant and not in use
@@ -24,6 +25,7 @@ class Bishop : public ChessPiece {
 		*@params: move_from, the square being moved from
 		* move_to, the square being moved to
 		* cg, an instance of a ChessGame object passed as a pointer
+		* @returns: a book, true if the move is valid for a bishop
 		*/
 		bool isValidMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg) override;
@@ -39,7 +41,8 @@ class Bishop : public ChessPiece {
 		~Bishop() override;
 
 		/*@brief: A getter function that the queen can use to
-		* define and then access its own name */
+		* define and then access its own name 
+		* @returns: a string literal of the word "Bishop" */
 		const char* getPieceName() const override;
 
 

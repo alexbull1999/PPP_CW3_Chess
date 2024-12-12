@@ -47,7 +47,8 @@ class ChessPiece {
 	public:
 		/*@brief: ChessPiece Constructor, only ever invoked by subclasses as
 		 * ChessPiece is an abstract class
-		 * @params: pieceColour, the colour of the piece being created */
+		 * @params: pieceColour, the colour of the piece being created
+		 * @returns: a ChessPiece object*/
 		ChessPiece(Colour pieceColour);
 
 		/*@brief: a pure virtual isValidMove function to determine whether a
@@ -55,6 +56,7 @@ class ChessPiece {
 		 *@params: move_from, the square being moved from
 		 * move_to, the square being moved to
 		 * cg, an instance of a ChessGame object passed as a pointer
+		 * @returns: a bool, true if the move is valid for a given piece
 		 */
 		virtual bool isValidMove(char const move_from[2], 
 				char const move_to[2], ChessGame* cg) = 0;
@@ -92,20 +94,22 @@ class ChessPiece {
 	protected:
 		Colour pieceColour;
 
-		/*@brief: A function to determine if a submitted chess move is valid
-		 *by rook logic
-		 *@params: move_from, the square being moved from
-		 *move_to, the square being moved to
-		 *cg, an instance of a ChessGame object passed as a pointer
+		/* @brief: A function to determine if a submitted chess move is valid
+		 * by rook logic
+		 * @params: move_from, the square being moved from
+		 * move_to, the square being moved to
+		 * cg, an instance of a ChessGame object passed as a pointer
+		 * @returns: a bool, true if a move is valid by rook logic
 		 */
 		bool isValidRookMove(char const move_from[2], char const move_to[2],
 			ChessGame* cg);
 
-		/*@brief: A function to determine if a submitted chess move is valid
-		*by bishop logic
-		*@params: move_from, the square being moved from
-		*move_to, the square being moved to
-		*cg, an instance of a ChessGame object passed as a pointer
+		/* @brief: A function to determine if a submitted chess move is valid
+	  * by bishop logic
+		* @params: move_from, the square being moved from
+		* move_to, the square being moved to
+		* cg, an instance of a ChessGame object passed as a pointer
+		* @returns: a bool, true if a move is valid by bishop logic
 		*/
 		bool isValidBishopMove(char const move_from[2], char const move_to[2],
 			ChessGame* cg);

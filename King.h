@@ -26,7 +26,8 @@ class King : public ChessPiece {
 	public:
 
 		/*@brief: Pawn Constructor
-		* @params: pieceColour, the colour of the piece being created */
+		* @params: pieceColour, the colour of the piece being created
+		* @returns: a King object */
 		King(Colour pieceColour);
 
 		//King clone method, now entirely redundant
@@ -36,7 +37,8 @@ class King : public ChessPiece {
 		* according to a pawn's movement rules
 		*@params: move_from, the square being moved from
 		* move_to, the square being moved to
-		* cg, an instance of a ChessGame object passed as a pointer */
+		* cg, an instance of a ChessGame object passed as a pointer 
+		* @returns: a bool, true if the move is valid by King logic */
 		bool isValidMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg) override;
 
@@ -47,7 +49,8 @@ class King : public ChessPiece {
 		void printPiece(std::ostream&) override;
 
 		/*@brief: A getter function that the queen can use to
-		* define and then access its own name */
+		* define and then access its own name
+		* @returns: a string literal of the word "King" */
 		const char* getPieceName() const override;
 
 		/* @brief: overriding the virtual ChessPiece destructor to ensure
@@ -67,7 +70,9 @@ class King : public ChessPiece {
 		 * and if they are doing so validly or not (from my research online,
 		 * it seems that castling should be interpreted as the King's move,
 		 * and hence a player trying to castle would submit a move of
-		 * e.g. ("E1", "G1")) */
+		 * e.g. ("E1", "G1")) 
+		 * @returns: a bool, true if the King is trying to commit a valid
+		 * castling move */
 		bool checkForCastlingMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg);
 

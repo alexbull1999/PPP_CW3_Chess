@@ -24,7 +24,8 @@ class Rook : public ChessPiece {
 	public:
 
 		/*@brief: Rook Constructor
-		* @params: pieceColour, the colour of the piece being created */
+		* @params: pieceColour, the colour of the piece being created 
+		* @returns: a rook object */
 		Rook(Colour pieceColour);
 		
 		//Rook clone method now redundant, and not used at all
@@ -35,6 +36,7 @@ class Rook : public ChessPiece {
 		*@params: move_from, the square being moved from
 		* move_to, the square being moved to
 		* cg, an instance of a ChessGame object passed as a pointer
+		* @returns: a bool, true if the move is valid for a rook
 		*/
 		bool isValidMove(char const move_from[2], char const move_to[2],
 				ChessGame* cg) override;
@@ -46,7 +48,8 @@ class Rook : public ChessPiece {
 		void printPiece(std::ostream&) override;
 
 		/*@brief: A getter function that the queen can use to
-		* define and then access its own name */
+		* define and then access its own name
+		* @returns: a string literal of the word "Rook" */
 		const char* getPieceName() const override;
 
 		/* @brief: overriding the virtual ChessPiece destructor to ensure
